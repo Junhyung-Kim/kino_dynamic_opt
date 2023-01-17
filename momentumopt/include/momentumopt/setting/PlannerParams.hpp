@@ -145,6 +145,7 @@ namespace momentumopt {
 	PlannerVectorParam_WeightLinearMomentum,
 	PlannerVectorParam_WeightAngularMomentum,
     PlannerVectorParam_WeightLinearMomentumRate,
+    PlannerVectorParam_WeightZMP,
     PlannerVectorParam_WeightAngularMomentumRate,
 	PlannerVectorParam_WeightFinalLinearMomentum,
 	PlannerVectorParam_WeightCenterOfMassViapoint,

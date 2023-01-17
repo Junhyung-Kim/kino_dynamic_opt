@@ -191,8 +191,8 @@ namespace momentumopt {
       Eigen::Vector3d com_pos_goal_, weight_desired_com_tracking_;
 
       /*! helper optimization variables for the optimization problem */
-      solver::OptimizationVariable dt_, com_, lmom_, amom_, lmomd_, amomd_;
-      std::array<solver::OptimizationVariable, Problem::n_endeffs_> frc_world_, trq_local_, cop_local_, ub_var_, lb_var_;
+      solver::OptimizationVariable dt_, com_, lmom_, amom_, lmomd_, amomd_, ZMP_;
+      std::array<solver::OptimizationVariable, Problem::n_endeffs_> ub_var_, lb_var_;
 
       /*! helper matrices and vectors for the optimization problem */
       solver::OptimizationVariable::OptVector solution_;

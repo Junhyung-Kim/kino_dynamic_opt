@@ -1,0 +1,29 @@
+[0.008s] Invoking command in '/home/jhk/kino_dynamic_opt/build/solver': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver
+[0.046s] -- The C compiler identification is GNU 7.5.0
+[0.085s] -- The CXX compiler identification is GNU 7.5.0
+[0.090s] -- Detecting C compiler ABI info
+[0.127s] -- Detecting C compiler ABI info - done
+[0.133s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.133s] -- Detecting C compile features
+[0.134s] -- Detecting C compile features - done
+[0.136s] -- Detecting CXX compiler ABI info
+[0.181s] -- Detecting CXX compiler ABI info - done
+[0.188s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.188s] -- Detecting CXX compile features
+[0.188s] -- Detecting CXX compile features - done
+[0.195s] [31mCMake Error at CMakeLists.txt:27 (find_package):
+[0.195s]   Could not find a package configuration file provided by "pybind11" with any
+[0.195s]   of the following names:
+[0.195s] 
+[0.195s]     pybind11Config.cmake
+[0.195s]     pybind11-config.cmake
+[0.195s] 
+[0.195s]   Add the installation prefix of "pybind11" to CMAKE_PREFIX_PATH or set
+[0.195s]   "pybind11_DIR" to a directory containing one of the above files.  If
+[0.195s]   "pybind11" provides a separate development package or SDK, be sure it has
+[0.195s]   been installed.
+[0.195s] 
+[0.195s] [0m
+[0.196s] -- Configuring incomplete, errors occurred!
+[0.196s] See also "/home/jhk/kino_dynamic_opt/build/solver/CMakeFiles/CMakeOutput.log".
+[0.197s] Invoked command in '/home/jhk/kino_dynamic_opt/build/solver' returned '1': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver

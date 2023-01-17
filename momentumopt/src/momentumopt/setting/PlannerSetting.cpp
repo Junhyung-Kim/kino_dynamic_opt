@@ -106,6 +106,7 @@ namespace momentumopt {
       YAML::ReadParameter(planner_vars, "w_lmom", w_lmom_);
       YAML::ReadParameter(planner_vars, "w_amomd", w_amomd_);
       YAML::ReadParameter(planner_vars, "w_lmomd", w_lmomd_);
+      YAML::ReadParameter(planner_vars, "w_zmp", w_zmp_);
       YAML::ReadParameter(planner_vars, "w_com_via", w_com_via_);
       YAML::ReadParameter(planner_vars, "w_trq_arm", w_trq_arm_);
       YAML::ReadParameter(planner_vars, "w_trq_leg", w_trq_leg_);
@@ -414,6 +415,7 @@ namespace momentumopt {
       case PlannerVectorParam_WeightArmForceRate : { return w_dfrc_arm_; }
       case PlannerVectorParam_WeightLegForceRate : { return w_dfrc_leg_; }
       case PlannerVectorParam_WeightLinearMomentumRate : { return w_lmomd_; }
+      case PlannerVectorParam_WeightZMP : { return w_zmp_; }
       case PlannerVectorParam_WeightAngularMomentumRate : { return w_amomd_; }
       case PlannerVectorParam_WeightCenterOfMassViapoint : { return w_com_via_; }
       case PlannerVectorParam_WeightFinalLinearMomentum : { return w_lmom_final_; }
@@ -649,6 +651,7 @@ namespace momentumopt {
       case PlannerVectorParam_WeightArmForceRate : { return w_dfrc_arm_; }
       case PlannerVectorParam_WeightLegForceRate : { return w_dfrc_leg_; }
       case PlannerVectorParam_WeightLinearMomentumRate : { return w_lmomd_; }
+      case PlannerVectorParam_WeightZMP : { return w_zmp_; }
       case PlannerVectorParam_WeightAngularMomentumRate : { return w_amomd_; }
       case PlannerVectorParam_WeightCenterOfMassViapoint : { return w_com_via_; }
       case PlannerVectorParam_WeightFinalLinearMomentum : { return w_lmom_final_; }

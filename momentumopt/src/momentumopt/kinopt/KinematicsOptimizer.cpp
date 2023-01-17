@@ -43,7 +43,7 @@ namespace momentumopt {
 
     *current_state_ = KinematicsState(this->getSetting().get(PlannerIntParam_NumDofs));
     current_state_->robotPosture().jointPositions() = this->getSetting().get(PlannerVectorParam_KinematicDefaultJointPositions);
-
+    
     // optimization of initial posture
     this->optimizePosture(*current_state_, ini_state, true);
     *ini_state_ = *current_state_;
@@ -58,6 +58,15 @@ namespace momentumopt {
 
     // time-horizon motion optimization
     this->optimizeTrajectory(ini_state, dyn_sequence);
+
+    for(int i=0; i < 100; i ++)
+    {
+      std::cout << "time " << i << std::endl;
+      std::cout << "kin COM" << this->kinematicsSequence().kinematicsState(i).centerOfMass() << std::endl;
+      std::cout << "AM" << this->kinematicsSequence().kinematicsState(i).angularMomentum() << std::endl;
+      std::cout << "lm" << this->kinematicsSequence().kinematicsState(i).linearMomentum() << std::endl;
+      std::cout << "base" << this->kinematicsSequence().kinematicsState(i).robotPosture().basePosition() << std::endl;
+    }
     if (this->getSetting().get(PlannerBoolParam_DisplayMotion)) { this->displayMotion(dyn_sequence); }
 
     if (this->getSetting().get(PlannerBoolParam_StoreData)) { this->storeSolution(ini_state, dyn_sequence); }

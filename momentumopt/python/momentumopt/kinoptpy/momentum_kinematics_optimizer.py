@@ -26,7 +26,6 @@ from pymomentum import \
     PlannerIntParam_NumTimesteps, \
     PlannerDoubleParam_TimeStep
 
-
 class EndeffectorTrajectoryGenerator(object):
     def __init__(self):
         self.z_offset = 0.1
@@ -101,8 +100,11 @@ class EndeffectorTrajectoryGenerator(object):
         '''
         dt = mom_kin_optimizer.dt
         num_eff = len(mom_kin_optimizer.eff_names)
+        #print("num_eff")
+        #print(mom_kin_optimizer.eff_names[0])
+        #print(mom_kin_optimizer.eff_names[1])
+        
         num_time_steps = mom_kin_optimizer.num_time_steps
-
 
         contact_plan = self.get_contact_plan_from_dyn_optimizer(mom_kin_optimizer)
 
@@ -188,7 +190,6 @@ class MomentumKinematicsOptimizer(object):
 
         self.max_iterations = max_iterations
         self.eps = eps
-
         self.robot = RobotWrapper()
 
         self.reset()
@@ -203,11 +204,13 @@ class MomentumKinematicsOptimizer(object):
         self.amom_kin = np.zeros((self.num_time_steps, 3))
         self.q_kin = np.zeros((self.num_time_steps, self.robot.model.nq))
         self.dq_kin = np.zeros((self.num_time_steps, self.robot.model.nv))
+        self.rf_ori_kin = np.zeros((self.num_time_steps, 3))
+        self.lf_ori_kin = np.zeros((self.num_time_steps, 3))
 
-        self.hip_names = ['{}_HFE'.format(eff) for eff in self.robot.effs]
+        self.hip_names = ['base_link'.format(eff) for eff in self.robot.effs]
         self.hip_ids = [self.robot.model.getFrameId(name) for name in self.hip_names]
-        self.eff_names = ['{}_{}'.format(eff, self.robot.joints_list[-1]) for eff in self.robot.effs]
-
+        #otherrobot = self.robot.effs#
+        self.eff_names = self.robot.effs#= ['{}_{}'.format(eff, self.robot.joints_list[-1]) for eff in self.robot.effs]
         self.inv_kin = PointContactInverseKinematics(self.robot.model, self.eff_names)
         self.snd_order_inv_kin = SecondOrderInverseKinematics(self.robot.model, self.eff_names)
         self.use_second_order_inv_kin = False
@@ -225,6 +228,8 @@ class MomentumKinematicsOptimizer(object):
           self.com_dyn[it] = self.dynamic_sequence.dynamics_states[it].com
           self.lmom_dyn[it] = self.dynamic_sequence.dynamics_states[it].lmom
           self.amom_dyn[it] = self.dynamic_sequence.dynamics_states[it].amom
+        #print("com1")
+        #print(self.com_dyn)  
 
     def fill_endeffector_trajectory(self):
         self.endeff_pos_ref, self.endeff_vel_ref, self.endeff_contact = \
@@ -232,6 +237,7 @@ class MomentumKinematicsOptimizer(object):
 
     def fill_kinematic_result(self, it, q, dq):
         def framesPos(frames):
+            
             return np.vstack([data.oMf[idx].translation for idx in frames]).reshape(-1)
 
         def framesVel(frames):
@@ -263,6 +269,8 @@ class MomentumKinematicsOptimizer(object):
         kinematic_state.com = self.com_kin[it]
         kinematic_state.lmom = self.lmom_kin[it]
         kinematic_state.amom = self.amom_kin[it]
+        kinematic_state.rf_ori = self.rf_ori_kin[it]
+        kinematic_state.lf_ori = self.lf_ori_kin[it]
 
         kinematic_state.robot_posture.base_position = q[:3]
         kinematic_state.robot_posture.base_orientation = q[3:7]
@@ -286,7 +294,7 @@ class MomentumKinematicsOptimizer(object):
                     len(plan_joint_init_pos), self.robot.num_ctrl_joints))
 
         q[7:] = plan_joint_init_pos
-        q[2] = init_state.com[2]
+        
         dq = np.zeros(self.robot.robot.nv)
 
         com_ref = init_state.com
@@ -298,13 +306,14 @@ class MomentumKinematicsOptimizer(object):
         endeff_contact = np.ones(num_eff)
         quad_goal = se3.Quaternion(se3.rpy.rpyToMatrix(np.zeros([3,])))
         q[3:7] = quad_goal.coeffs()
+        self.max_iterations = 100
 
         for iters in range(self.max_iterations):
             # Adding small P controller for the base orientation to always start with flat
             # oriented base.
             quad_q = se3.Quaternion(float(q[6]), float(q[3]), float(q[4]), float(q[5]))
-            amom_ref = 1e-1 * se3.log((quad_goal * quad_q.inverse()).matrix())
 
+            amom_ref = 1e-1 * se3.log((quad_goal * quad_q.inverse()).matrix())
             res = self.inv_kin.compute(q, dq, com_ref, lmom_ref, amom_ref,
                                       endeff_pos_ref, endeff_vel_ref, endeff_contact, None)
             q = se3.integrate(self.robot.model, q, res)
@@ -316,8 +325,6 @@ class MomentumKinematicsOptimizer(object):
         if iters == self.max_iterations - 1:
             print('Failed to converge for initial setup.')
 
-        print("initial configuration: \n", q)
-
         self.q_init = q.copy()
         self.dq_init = dq.copy()
 
@@ -325,8 +332,10 @@ class MomentumKinematicsOptimizer(object):
         self.init_state = init_state
         self.contact_sequence = contact_sequence
         self.dynamic_sequence = dynamic_sequence
+
         # Create array with centroidal and endeffector informations.
         self.fill_data_from_dynamics()
+
         self.fill_endeffector_trajectory()
 
         # Run the optimization for the initial configuration only once.
@@ -343,20 +352,21 @@ class MomentumKinematicsOptimizer(object):
             joint_traj_gen.num_time_steps = self.num_time_steps
             joint_traj_gen.init = self.q_init[7:]
             joint_traj_gen.end = self.q_init[7:]
+
             joint_traj_gen.generate_trajectory(self.n_via_joint, self.via_joint, self.dt)
             for it in range(self.num_time_steps):
                 self.joint_des[:,it] = joint_traj_gen.evaluate_trajecory(it)
-
+        
         # Generate smooth base trajectory for regularization
         self.base_des = np.zeros((3,self.num_time_steps), float)
-        if self.n_via_base == 0:
+        if self.n_via_base == 0:#other robot
             for it in range(self.num_time_steps):
-                self.base_des[:,it] = np.array([0., 0., 0.]).reshape(-1)
+                self.base_des[:,it] = np.array([0., 0., 0]).reshape(-1)
         else:
             base_traj_gen = TrajectoryInterpolator()
             base_traj_gen.num_time_steps = self.num_time_steps
-            base_traj_gen.init = np.array([0.0, 0.0, 0.0])
-            base_traj_gen.end = np.array([0.0, 0.0, 0.0])
+            base_traj_gen.init = np.array([0.0, 0.0, 0])
+            base_traj_gen.end = np.array([0.0, 0.0, 0])
             base_traj_gen.generate_trajectory(self.n_via_base, self.via_base, self.dt)
             for it in range(self.num_time_steps):
                 self.base_des[:,it] = base_traj_gen.evaluate_trajecory(it)
@@ -366,14 +376,36 @@ class MomentumKinematicsOptimizer(object):
         q, dq = self.q_init.copy(), self.dq_init.copy()
 
         if self.use_second_order_inv_kin:
-            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin = \
+            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, rf_ori_kin, lf_ori_kin= \
                 self.snd_order_inv_kin.solve(self.dt, q, dq, self.com_dyn, self.lmom_dyn,
                     self.amom_dyn, self.endeff_pos_ref, self.endeff_vel_ref,
                     self.endeff_contact, self.joint_des.T, self.base_des.T)
 
+            self.rf_ori_kin = rf_ori_kin
+            self.lf_ori_kin = lf_ori_kin
+
             for it, (q, dq) in enumerate(zip(q_kin, dq_kin)):
                 self.inv_kin.forward_robot(q, dq)
-                self.fill_kinematic_result(it, q, dq)
+                self.fill_kinematic_result(it, q, dq)                
+                if it <= 1:
+                    print("end-posref")
+                    print(it)
+                    print(self.q_kin[it])
+                    print("End-real")
+                    print(self.dq_kin[it])
+                    #print("com_kin")
+                    #print(self.com_kin[it]) 
+                    #print("base_kin")
+                    #print(self.q_kin[it][0:7]) 
+                    #print("eff_kin")
+                    #print(self.q_kin[it][0:7]) 
+                    #print("Eff_con")
+                    #print(self.endeff_contact[it])
+                    #print("rf_ori_kin")
+                    #print(self.rf_ori_kin[it])
+                    #print("lf_ori_kin")
+                    #print(self.lf_ori_kin[it])
+                
         else:
             for it in range(self.num_time_steps):
                 quad_goal = se3.Quaternion(se3.rpy.rpyToMatrix(np.matrix(self.base_des[:,it]).T))
@@ -386,6 +418,7 @@ class MomentumKinematicsOptimizer(object):
                         break
                     else:
                         is_flight_phase = True
+                        
                 ## for flight phase keep the desired momentum constant
                 if is_flight_phase:
                     lmom_ref[0:2] = mom_ref_flight[0:2]
@@ -405,8 +438,7 @@ class MomentumKinematicsOptimizer(object):
                 if not is_flight_phase:
                     mom_ref_flight = (self.inv_kin.J[0:6, :].dot(dq)).reshape(-1)
 
-            # Compute the inverse kinematics
-
+            # Compute the inverse kinematics  
                 dq = self.inv_kin.compute(
                         q, dq, self.com_dyn[it], lmom_ref, amom_ref,
                         self.endeff_pos_ref[it], self.endeff_vel_ref[it],
@@ -415,3 +447,41 @@ class MomentumKinematicsOptimizer(object):
 
                 # Integrate to the next state.
                 q = se3.integrate(self.robot.model, q, dq * self.dt)
+                
+                '''
+                print("comdyn")
+                print(self.com_dyn[it]) 
+                print("comkin")
+                print(self.com_kin[it]) 
+                print("lmom_ref")
+                print(lmom_ref) 
+                print("lmom_kin")
+                print(self.lmom_kin[it])
+                print("amom_ref")
+                print(amom_ref) 
+                print("amom_kin")
+                print(self.amom_kin[it]) 
+                '''                
+                
+            '''
+            print("comdyn")
+            print(self.com_dyn) 
+            print("comkin")
+            print(self.com_kin) 
+            print("lmom_ref")
+            print(lmom_ref) 
+            print("lmom_kin")
+            print(self.lmom_kin)
+            print("amom_ref")
+            print(amom_ref) 
+            print("amom_kin")
+            print(self.amom_kin) 
+            '''
+         #   print("end-posref")
+         #   print(self.endeff_pos_ref)
+         #   print(np.shape(self.endeff_pos_ref))
+         #   print("End-real")
+         #   print(self.motion_eff['trajectory'])
+         #   print("end=eff contact")
+         #   print(self.contact_plan[0])
+            

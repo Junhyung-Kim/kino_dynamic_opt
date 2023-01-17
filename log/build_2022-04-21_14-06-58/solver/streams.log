@@ -1,0 +1,17 @@
+[0.010s] Invoking command in '/home/jhk/kino_dynamic_opt/build/solver': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver
+[0.021s] [31mCMake Error at CMakeLists.txt:27 (find_package):
+[0.021s]   Could not find a package configuration file provided by "pybind11" with any
+[0.021s]   of the following names:
+[0.022s] 
+[0.022s]     pybind11Config.cmake
+[0.022s]     pybind11-config.cmake
+[0.022s] 
+[0.022s]   Add the installation prefix of "pybind11" to CMAKE_PREFIX_PATH or set
+[0.022s]   "pybind11_DIR" to a directory containing one of the above files.  If
+[0.022s]   "pybind11" provides a separate development package or SDK, be sure it has
+[0.022s]   been installed.
+[0.023s] 
+[0.023s] -- Configuring incomplete, errors occurred!
+[0.023s] See also "/home/jhk/kino_dynamic_opt/build/solver/CMakeFiles/CMakeOutput.log".
+[0.023s] [0m
+[0.023s] Invoked command in '/home/jhk/kino_dynamic_opt/build/solver' returned '1': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver

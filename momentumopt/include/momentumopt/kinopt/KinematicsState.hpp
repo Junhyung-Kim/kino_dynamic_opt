@@ -153,14 +153,20 @@ namespace momentumopt {
 	  Eigen::Vector3d& centerOfMass() { return com_; }
 	  Eigen::Vector3d& linearMomentum() { return lmom_; }
 	  Eigen::Vector3d& angularMomentum() { return amom_; }
+	  Eigen::Vector3d& rfOri() { return rf_ori_; }
+	  Eigen::Vector3d& lfOri() { return lf_ori_; }
 
 	  const Eigen::Vector3d& centerOfMass() const { return com_; }
 	  const Eigen::Vector3d& linearMomentum() const { return lmom_; }
 	  const Eigen::Vector3d& angularMomentum() const { return amom_; }
+    const Eigen::Vector3d& rfOri() const { return rf_ori_; }
+	  const Eigen::Vector3d& lfOri() const { return lf_ori_; }
 
 	  void centerOfMass(const Eigen::Vector3d& com) { com_ = com; }
 	  void linearMomentum(const Eigen::Vector3d& lmom) { lmom_ = lmom; }
 	  void angularMomentum(const Eigen::Vector3d& amom) { amom_ = amom; }
+    void rfOri(const Eigen::Vector3d& rfOri) { rf_ori_ = rfOri; }
+	  void lfOri(const Eigen::Vector3d& lfOri) { lf_ori_ = lfOri; }
 
       // robot joint variables
 	  RobotPosture& robotPosture() { return robot_posture_; }
@@ -200,7 +206,7 @@ namespace momentumopt {
 	  RobotAcceleration robot_acceleration_;
 
       int num_joints_;
-      Eigen::Vector3d com_, lmom_, amom_;
+      Eigen::Vector3d com_, lmom_, amom_, rf_ori_, lf_ori_;
       std::vector<Eigen::Quaternion<double>> eff_orientations_;
       std::vector<Eigen::Vector3d> eff_positions_, eff_velocities_, eff_accelerations_;
   };

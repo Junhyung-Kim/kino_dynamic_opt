@@ -172,6 +172,7 @@ class PolynominalList(object):
         i = 0
         while i < len(self.times) - 1 and self.times[i][1] < t:
             i += 1
+
         return self.polynominals[i]
 
     def eval(self, t):

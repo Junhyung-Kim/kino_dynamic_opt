@@ -9,26 +9,29 @@
 @date 2019-10-08
 '''
 
-import time
+import time, sys
+sys.path.append('/usr/local/lib/python3/dist-packages')
+sys.path.append('/home/jhk/kino_dynamic_opt/momentumopt/build/')
 from pysolver import *
-from pymomentum import *
 from pysolverlqr import *
+from pymomentum import *
 from pinocchio.utils import *
-import os, sys, getopt, numpy as np, pinocchio as pin
+import os, getopt, numpy as np, pinocchio as pin
 
 from momentumopt.kinoptpy.momentum_kinematics_optimizer import MomentumKinematicsOptimizer
 from momentumopt.motion_execution import MotionExecutor
 from momentumopt.kinoptpy.create_data_file import create_file, create_qp_files, create_lqr_files
 
 from momentumopt.motion_planner import MotionPlanner
-from .robots.blmc_robot_wrapper import QuadrupedWrapper, Quadruped12Wrapper, BipedWrapper
+from .robots.blmc_robot_wrapper import QuadrupedWrapper, Quadruped12Wrapper, BipedWrapper, BipedTocabiWrapper
 
 import matplotlib.pyplot as plt
+
 
 def parse_arguments(argv):
     cfg_file = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:m",["ifile=", "solo12", "bolt", "disable_lqr"])
+        opts, args = getopt.getopt(argv,"hi:m",["ifile=", "solo12", "bolt", "tocabi", "disable_lqr"])
     except getopt.GetoptError:
         print ('python kino_dyn_planner.py -i <path_to_datafile>')
         sys.exit(2)
@@ -46,11 +49,10 @@ def parse_arguments(argv):
             RobotWrapper = Quadruped12Wrapper
         elif opt in ("--bolt"):
             RobotWrapper = BipedWrapper
+        elif opt in ("--tocabi"):
+            RobotWrapper = BipedTocabiWrapper
         elif opt in ("--disable_lqr"):
             with_lqr = False
-
-    print(opts)
-    print(cfg_file)
 
     if not os.path.exists(cfg_file):
         raise RuntimeError("The config file " + cfg_file + " does not exist.")
@@ -111,10 +113,9 @@ def main(argv):
      planner_setting,
      time_vector) = build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr)
 
-
     # The default visualizer is Meshcat, if you wanna use geppeto_viewer
     # pass viz="gepetto" as an argument.
-    motion_planner.replay_kinematics(viz="meshcat")
+   # motion_planner.replay_kinematics(viz="gepetto")
 
     # Dump the computed trajectory in a files (should follow the dynamic graph format)
     motion_planner.save_files()

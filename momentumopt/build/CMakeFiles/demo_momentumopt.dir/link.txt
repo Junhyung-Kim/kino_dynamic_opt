@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wl,--no-as-needed -Wall -Wextra -Wpedantic CMakeFiles/demo_momentumopt.dir/demos/demo_momentumopt.cpp.o -o demo_momentumopt  -Wl,-rpath,/home/jhk/kino_dynamic_opt/momentumopt/build:/usr/local/lib: libmomentumopt.so /usr/local/lib/libsolver_lqr.so /usr/local/lib/libsolver.so /usr/local/lib/libboost_thread.so.1.77.0 -lpthread /usr/local/lib/libyaml-cpp.a 

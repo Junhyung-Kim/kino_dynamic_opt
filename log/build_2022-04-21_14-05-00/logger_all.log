@@ -1,0 +1,202 @@
+[0.116s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--cmake-args', '-DCMAKE_BUILD_TYPE=Release']
+[0.116s] DEBUG:colcon:Parsed command line arguments: Namespace(allow_overriding=[], ament_cmake_args=None, base_paths=['.'], build_base='build', catkin_cmake_args=None, catkin_skip_building_tests=False, cmake_args=['-DCMAKE_BUILD_TYPE=Release'], cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, cmake_target=None, cmake_target_skip_unavailable=False, continue_on_error=False, event_handlers=None, executor='parallel', ignore_user_meta=False, install_base='install', log_base=None, log_level=None, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f72bff91b70>>, merge_install=False, metas=['./colcon.meta'], packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_end=None, packages_ignore=None, packages_ignore_regex=None, packages_select=None, packages_select_build_failed=False, packages_select_by_dep=None, packages_select_regex=None, packages_select_test_failures=False, packages_skip=None, packages_skip_build_finished=False, packages_skip_by_dep=None, packages_skip_regex=None, packages_skip_test_passed=False, packages_skip_up_to=None, packages_start=None, packages_up_to=None, packages_up_to_regex=None, parallel_workers=8, paths=None, symlink_install=False, test_result_base=None, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f72bff91b70>, verb_name='build', verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7f72bff91eb8>)
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.134s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/jhk/kino_dynamic_opt'
+[0.134s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.134s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.134s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.134s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.134s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.135s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.135s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.135s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.135s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extensions ['ignore', 'ignore_ament_install']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'ignore'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'ignore_ament_install'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extensions ['colcon_pkg']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'colcon_pkg'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extensions ['colcon_meta']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'colcon_meta'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extensions ['ros']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'ros'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extensions ['cmake', 'python']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'cmake'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'python'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extensions ['python_setup_py']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel) by extension 'python_setup_py'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extensions ['ignore', 'ignore_ament_install']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'ignore'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'ignore_ament_install'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extensions ['colcon_pkg']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'colcon_pkg'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extensions ['colcon_meta']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'colcon_meta'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extensions ['ros']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'ros'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extensions ['cmake', 'python']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'cmake'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'python'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extensions ['python_setup_py']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/treep_machines_in_motion) by extension 'python_setup_py'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extensions ['ignore', 'ignore_ament_install']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'ignore'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'ignore_ament_install'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extensions ['colcon_pkg']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'colcon_pkg'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extensions ['colcon_meta']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'colcon_meta'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extensions ['ros']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'ros'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extensions ['cmake', 'python']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'cmake'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'python'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extensions ['python_setup_py']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace) by extension 'python_setup_py'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extensions ['ignore', 'ignore_ament_install']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'ignore'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'ignore_ament_install'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extensions ['colcon_pkg']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'colcon_pkg'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extensions ['colcon_meta']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'colcon_meta'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extensions ['ros']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'ros'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extensions ['cmake', 'python']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'cmake'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'python'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extensions ['python_setup_py']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(devel/workspace/src) by extension 'python_setup_py'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extensions ['ignore', 'ignore_ament_install']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'ignore'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'ignore_ament_install'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extensions ['colcon_pkg']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'colcon_pkg'
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extensions ['colcon_meta']
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'colcon_meta'
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extensions ['ros']
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'ros'
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extensions ['cmake', 'python']
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'cmake'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(momentumopt) by extension 'python'
+[0.157s] DEBUG:colcon.colcon_core.package_identification:Package 'momentumopt' with type 'cmake' and name 'momentumopt'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extensions ['ignore', 'ignore_ament_install']
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'ignore'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'ignore_ament_install'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extensions ['colcon_pkg']
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'colcon_pkg'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extensions ['colcon_meta']
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'colcon_meta'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extensions ['ros']
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'ros'
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extensions ['cmake', 'python']
+[0.157s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'cmake'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver) by extension 'python'
+[0.159s] DEBUG:colcon.colcon_core.package_identification:Package 'solver' with type 'cmake' and name 'solver'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extensions ['ignore', 'ignore_ament_install']
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'ignore'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'ignore_ament_install'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extensions ['colcon_pkg']
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'colcon_pkg'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extensions ['colcon_meta']
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'colcon_meta'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extensions ['ros']
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'ros'
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extensions ['cmake', 'python']
+[0.159s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'cmake'
+[0.160s] Level 1:colcon.colcon_core.package_identification:_identify(solver_lqr) by extension 'python'
+[0.160s] DEBUG:colcon.colcon_core.package_identification:Package 'solver_lqr' with type 'cmake' and name 'solver_lqr'
+[0.160s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.160s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.160s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.161s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.161s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.173s] INFO:colcon.colcon_metadata.metadata.colcon_pkg:Updating descriptor of package 'solver' from colcon.pkg: {'test-dependencies': ['googletest-distribution']}
+[0.174s] INFO:colcon.colcon_metadata.metadata.colcon_pkg:Updating descriptor of package 'solver_lqr' from colcon.pkg: {'test-dependencies': ['googletest-distribution']}
+[0.174s] INFO:colcon.colcon_metadata.metadata.colcon_pkg:Updating descriptor of package 'momentumopt' from colcon.pkg: {'test-dependencies': ['googletest-distribution']}
+[0.175s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.175s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.177s] ERROR:colcon.colcon_core.package_discovery:Exception in package discovery extension 'prefix_path': object of type 'NoneType' has no len()
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/colcon_core/package_discovery/__init__.py", line 251, in _discover_packages
+    args=args, identification_extensions=identification_extensions)
+  File "/usr/lib/python3/dist-packages/colcon_installed_package_information/package_discovery/prefix_path.py", line 30, in discover
+    num_packages = len(packages)
+TypeError: object of type 'NoneType' has no len()
+
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'cmake_args' from command line to '['-DCMAKE_BUILD_TYPE=Release']'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'cmake_target' from command line to 'None'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'cmake_clean_cache' from command line to 'False'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'cmake_clean_first' from command line to 'False'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'cmake_force_configure' from command line to 'False'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'ament_cmake_args' from command line to 'None'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'catkin_cmake_args' from command line to 'None'
+[0.178s] Level 5:colcon.colcon_core.verb:set package 'solver' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.179s] DEBUG:colcon.colcon_core.verb:Building package 'solver' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/jhk/kino_dynamic_opt/build/solver', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': ['-DCMAKE_BUILD_TYPE=Release'], 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/jhk/kino_dynamic_opt/install/solver', 'merge_install': False, 'path': '/home/jhk/kino_dynamic_opt/solver', 'symlink_install': False, 'test_result_base': None}
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'cmake_args' from command line to '['-DCMAKE_BUILD_TYPE=Release']'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'cmake_target' from command line to 'None'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'cmake_clean_cache' from command line to 'False'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'cmake_clean_first' from command line to 'False'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'cmake_force_configure' from command line to 'False'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'ament_cmake_args' from command line to 'None'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'catkin_cmake_args' from command line to 'None'
+[0.179s] Level 5:colcon.colcon_core.verb:set package 'solver_lqr' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.179s] DEBUG:colcon.colcon_core.verb:Building package 'solver_lqr' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/jhk/kino_dynamic_opt/build/solver_lqr', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': ['-DCMAKE_BUILD_TYPE=Release'], 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/jhk/kino_dynamic_opt/install/solver_lqr', 'merge_install': False, 'path': '/home/jhk/kino_dynamic_opt/solver_lqr', 'symlink_install': False, 'test_result_base': None}
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'cmake_args' from command line to '['-DCMAKE_BUILD_TYPE=Release']'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'cmake_target' from command line to 'None'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'cmake_clean_cache' from command line to 'False'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'cmake_clean_first' from command line to 'False'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'cmake_force_configure' from command line to 'False'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'ament_cmake_args' from command line to 'None'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'catkin_cmake_args' from command line to 'None'
+[0.180s] Level 5:colcon.colcon_core.verb:set package 'momentumopt' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.180s] DEBUG:colcon.colcon_core.verb:Building package 'momentumopt' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/jhk/kino_dynamic_opt/build/momentumopt', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': ['-DCMAKE_BUILD_TYPE=Release'], 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/jhk/kino_dynamic_opt/install/momentumopt', 'merge_install': False, 'path': '/home/jhk/kino_dynamic_opt/momentumopt', 'symlink_install': False, 'test_result_base': None}
+[0.180s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.182s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.182s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/jhk/kino_dynamic_opt/solver'
+[0.185s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.185s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.185s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.186s] DEBUG:colcon.colcon_core.shell:Ignoring prefix path '/home/jhk/catkin_ws/devel'
+[0.192s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/jhk/kino_dynamic_opt/build/solver': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver
+[0.208s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/jhk/kino_dynamic_opt/build/solver' returned '1': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver
+[0.218s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[0.218s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[0.219s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '1'
+[0.219s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[0.224s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[0.224s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[0.224s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[0.226s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[0.227s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/jhk/kino_dynamic_opt/install/local_setup.ps1'
+[0.228s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/jhk/kino_dynamic_opt/install/_local_setup_util_ps1.py'
+[0.229s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/jhk/kino_dynamic_opt/install/setup.ps1'
+[0.230s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/jhk/kino_dynamic_opt/install/local_setup.sh'
+[0.230s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/jhk/kino_dynamic_opt/install/_local_setup_util_sh.py'
+[0.231s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/jhk/kino_dynamic_opt/install/setup.sh'
+[0.232s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/jhk/kino_dynamic_opt/install/local_setup.bash'
+[0.232s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/jhk/kino_dynamic_opt/install/setup.bash'
+[0.233s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/jhk/kino_dynamic_opt/install/local_setup.zsh'
+[0.233s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/jhk/kino_dynamic_opt/install/setup.zsh'

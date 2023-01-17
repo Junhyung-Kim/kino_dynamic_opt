@@ -55,5 +55,5 @@ planner_variables:
   w_lmom_track:    [ 0.00,  0.000,  0.000]
 
 
-  store_data: False
+  store_data: True
   use_default_solver_setting: True

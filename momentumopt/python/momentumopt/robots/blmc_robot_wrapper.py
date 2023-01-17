@@ -13,8 +13,9 @@ import numpy as np
 import pinocchio
 from pinocchio.robot_wrapper import RobotWrapper
 from pinocchio.utils import zero
-from robot_properties_solo.config import Solo8Config, Solo12Config
 from robot_properties_bolt.config import BoltConfig
+from robot_properties_tocabi.config import TocabiConfig
+from robot_properties_solo.config import Solo8Config, Solo12Config
 
 class BasicRobotWrapper(object):
 
@@ -218,7 +219,7 @@ class Quadruped12Wrapper(BasicRobotWrapper):
         self.colors = {"HL": "r", "HR": "y", "FL": "b", "FR": "g"}
         self.joints_list = ["HAA", "HFE", "KFE", "ANKLE"]
         self.floor_height = 0.
-
+        print("solo")
         self.robot = Solo12Config.buildRobotWrapper()
 
         self.num_ctrl_joints = 12
@@ -266,7 +267,6 @@ class BipedWrapper(BasicRobotWrapper):
         # self.colors = {"L": "r", "R": "y"}
         self.joints_list = ["HAA", "HFE", "KFE", "ANKLE"]
         self.floor_height = 0.
-
         self.robot = BoltConfig.buildRobotWrapper()
 
         self.num_ctrl_joints = 6
@@ -302,4 +302,69 @@ class BipedWrapper(BasicRobotWrapper):
         self.q[7:] = q_dummy
 
         # print(self.q)
+        self.set_configuration(self.q)
+
+class BipedTocabiWrapper(BasicRobotWrapper):
+
+    def __init__(self, q=None):
+        super(BipedTocabiWrapper, self).__init__()
+
+        self.effs = ["RF_contact", "LF_contact"]
+        # self.colors = {"L": "r", "R": "y"}
+        self.joints_list = ["R_HipYaw_Joint", "R_HipRoll_Joint", "R_HipPitch_Joint", "R_Knee_Joint", "R_AnklePitch_Joint", "R_AnkleRoll_Joint", "L_HipYaw_Joint", "L_HipRoll_Joint", "L_HipPitch_Joint", "L_Knee_Joint", "L_AnklePitch_Joint", "L_AnkleRoll_Joint"]
+        self.floor_height = 0.
+        self.robot = TocabiConfig.buildRobotWrapper()
+
+        self.num_ctrl_joints = 12
+
+        # Create data again after setting frames
+        self.model = self.robot.model
+
+        contactPointLF = pinocchio.SE3.Identity()
+        contactPointRF = pinocchio.SE3.Identity()
+        
+        contactPointLF.translation.T.flat = [0.03, 0, -0.14151976]
+        contactPointRF.translation.T.flat = [0.03, 0, -0.14151976]
+
+        LFframe_id = self.model.getFrameId("L_Foot_Link")
+        RFframe_id = self.model.getFrameId("R_Foot_Link")
+
+        RFjoint_id = self.model.getJointId("R_AnkleRoll_Joint")
+        LFjoint_id = self.model.getJointId("L_AnkleRoll_Joint")
+        
+        self.model.addBodyFrame("LF_contact", LFjoint_id, contactPointLF, LFframe_id)
+        self.model.addBodyFrame("RF_contact", RFjoint_id, contactPointRF, RFframe_id)
+
+        LFcframe_id = self.model.getFrameId("LF_contact")
+        RFcframe_id = self.model.getFrameId("RF_contact")
+        self.robot.data = self.model.createData()
+        self.data = self.robot.data
+        initial_configuration = np.array(
+            [0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
+        )        
+        self.q = initial_configuration
+        if not q is None:
+            self.set_configuration(q)
+        else:
+            self.q = None
+        self.M_com = None
+
+        self.mass = sum([i.mass for i in self.model.inertias[1:]])
+
+        self.set_init_config()
+
+
+    def set_init_config(self):
+        model = self.model
+        data = self.data
+        NQ = model.nq
+        NV = model.nv
+        self.q, self.dq, self.ddq, tau = zero(NQ), zero(NV), zero(NV), zero(NV)
+
+#        self.q = pinocchio.neutral(self.robot.model)
+        initial_configuration = np.array(
+            [0.0, 0.0, 0.7457, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, -0.606, 1.572, -0.92, 0.0, 0.0, 0.0, -0.606, 1.572, -0.92, 0.0]
+        )        
+        self.q = initial_configuration
+
         self.set_configuration(self.q)

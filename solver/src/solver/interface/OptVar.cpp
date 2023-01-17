@@ -25,8 +25,9 @@ namespace solver {
 	assert(rows == lBnd.rows());
 	assert(rows == uBnd.rows());
 	type_ = type;  rows_ = rows;  cols_ = cols;
-    lBndMat_.resize(rows, cols);  lBndMat_.setZero();  lBndMat_.colwise() = lBnd.block(0,0,rows_,1);
-    uBndMat_.resize(rows, cols);  uBndMat_.setZero();  uBndMat_.colwise() = uBnd.block(0,0,rows_,1);
+  const int rows2 = rows_;
+    lBndMat_.resize(rows, cols);  lBndMat_.setZero();  lBndMat_.colwise() = lBnd.col(0);
+    uBndMat_.resize(rows, cols);  uBndMat_.setZero();  uBndMat_.colwise() = uBnd.col(0);
     guessMat_.resize(rows, cols); guessMat_.setZero();
     indexPosition_ = startIndexInOptVec;  startIndexInOptVec += rows*cols;
   }
@@ -36,8 +37,8 @@ namespace solver {
     assert(rows == lBnd.rows());   assert(cols == lBnd.cols());
 	assert(rows == uBnd.rows());   assert(cols == uBnd.cols());
 	type_ = type;  rows_ = rows;  cols_ = cols;
-    lBndMat_.resize(rows, cols);  lBndMat_ = lBnd.block(0,0,rows,cols);
-    uBndMat_.resize(rows, cols);  uBndMat_ = uBnd.block(0,0,rows,cols);
+    lBndMat_.resize(rows, cols);  lBndMat_ = lBnd.col(0);
+    uBndMat_.resize(rows, cols);  uBndMat_ = uBnd.col(0);
     guessMat_.resize(rows, cols); guessMat_.setZero();
     indexPosition_ = startIndexInOptVec;  startIndexInOptVec += rows*cols;
   }
@@ -70,8 +71,8 @@ namespace solver {
 	assert(rows == guess.rows());   assert(cols == guess.cols());
 	guessValueInitialized_ = true;
     type_ = type;  rows_ = rows;  cols_ = cols;
-    lBndMat_.resize(rows, cols);  lBndMat_.setZero(); lBndMat_.colwise() = lBnd.block(0,0,rows_,1);
-    uBndMat_.resize(rows, cols);  uBndMat_.setZero(); uBndMat_.colwise() = uBnd.block(0,0,rows_,1);
+    lBndMat_.resize(rows, cols);  lBndMat_.setZero(); lBndMat_.colwise() = lBnd.col(0);
+    uBndMat_.resize(rows, cols);  uBndMat_.setZero(); uBndMat_.colwise() = uBnd.col(0);
     guessMat_.resize(rows, cols); guessMat_ = guess.block(0, 0, rows, cols);;
     indexPosition_ = startIndexInOptVec;  startIndexInOptVec += rows*cols;
   }

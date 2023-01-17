@@ -34,15 +34,15 @@ class PointContactInverseKinematics(object):
         self.nv = self.model.nv
 
         # Tracking weights
-        self.w_endeff_tracking = 1.
-        self.w_endeff_contact = 1.
-        self.w_lin_mom_tracking = 1.0
-        self.w_ang_mom_tracking = 1.0
+        self.w_endeff_tracking = 80.
+        self.w_endeff_contact = 80.
+        self.w_lin_mom_tracking = 0.0#1.0
+        self.w_ang_mom_tracking = 0.0#1.0
         self.w_joint_regularization = 0.01
 
         # P gains for tracking the position
-        self.p_endeff_tracking = 1.
-        self.p_com_tracking = 1.
+        self.p_endeff_tracking = 50.
+        self.p_com_tracking = 8.
 
         self.last_q = None
         self.last_dq = None
@@ -140,9 +140,7 @@ class PointContactInverseKinematics(object):
         self.fill_weights(endeff_contact)
 
         self.forwarded_robot = False
-        # print("weighting matrix shape:",np.shape(self.w))
-        # print("Jacobian shape:",np.shape(self.J))
-        # print("desired vel shape:",np.shape(self.vel_des))
+        
         hessian = self.J.T.dot(self.w).dot(self.J)
         hessian += 1e-6 * np.identity(len(hessian))
         gradient = -self.J.T.dot(self.w).dot(self.vel_des).reshape(-1)

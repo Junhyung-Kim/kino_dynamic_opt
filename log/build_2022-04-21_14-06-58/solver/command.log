@@ -1,0 +1,2 @@
+Invoking command in '/home/jhk/kino_dynamic_opt/build/solver': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver
+Invoked command in '/home/jhk/kino_dynamic_opt/build/solver' returned '1': /usr/bin/cmake /home/jhk/kino_dynamic_opt/solver -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/jhk/kino_dynamic_opt/install/solver

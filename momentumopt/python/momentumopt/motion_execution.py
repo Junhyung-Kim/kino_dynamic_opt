@@ -50,8 +50,52 @@ def desired_state(specification, time_vector, optimized_sequence=None, dynamics_
 
     def eff_force_vector(dynamic_state):
         """ Combines the forces at each endeffector into a single vector. """
+        '''
+        print("torque")
+        print(dynamic_state.effTorque(0))
+        print(dynamic_state.effForce(0))
+        print(dynamic_state.effTorqueContact(0))
+        '''
         return np.hstack([
             dynamic_state.effForce(eff_id) for eff_id in range(dynamic_state.effNum())
+            #dynamic_state.effTorqueContact(eff_id) for eff_id in range(dynamic_state.effNum())
+        ])
+
+    def eff_torquecontact_vector(dynamic_state):
+        """ Combines the forces at each endeffector into a single vector. """
+        '''
+        print("torque")
+        print(dynamic_state.effTorque(0))
+        print(dynamic_state.effForce(0))
+        print(dynamic_state.effTorqueContact(0))
+        '''
+        return np.hstack([
+            dynamic_state.effTorqueContact(eff_id) for eff_id in range(dynamic_state.effNum())
+            #dynamic_state.effTorqueContact(eff_id) for eff_id in range(dynamic_state.effNum())
+        ])
+
+    def eff_torque_vector(dynamic_state):
+        """ Combines the forces at each endeffector into a single vector. """
+        
+        return np.hstack([
+            dynamic_state.effTorque(eff_id) for eff_id in range(dynamic_state.effNum())
+            #dynamic_state.effTorqueContact(eff_id) for eff_id in range(dynamic_state.effNum())
+        ])
+
+    def eff_cop_vector(dynamic_state):
+        """ Combines the forces at each endeffector into a single vector. """
+        
+        return np.hstack([
+            dynamic_state.effCoP(0)
+            #dynamic_state.effTorqueContact(eff_id) for eff_id in range(dynamic_state.effNum())
+        ])
+
+    def eff_ori_vector(dynamic_state):
+        """ Combines the forces at each endeffector into a single vector. """
+
+        return np.hstack([
+            dynamic_state.effOrientationEigen(eff_id) for eff_id in range(dynamic_state.effNum())
+            #dynamic_state.effTorqueContact(eff_id) for eff_id in range(dynamic_state.effNum())
         ])
 
     def desired_state_eval(t):
@@ -62,6 +106,8 @@ def desired_state(specification, time_vector, optimized_sequence=None, dynamics_
             t2_idx = closest_idx
         else:
             t1_idx = closest_idx
+
+
             t2_idx = min(closest_idx + 1, len(time_vector) - 1)
 
         state_1 = None
@@ -85,6 +131,12 @@ def desired_state(specification, time_vector, optimized_sequence=None, dynamics_
         elif specification == 'FORCES':
             state_1 = eff_force_vector(optimized_dyn_plan.dynamics_states[t1_idx])
             state_2 = eff_force_vector(optimized_dyn_plan.dynamics_states[t2_idx])
+        elif specification == 'TORQUESC':
+            state_1 = eff_torquecontact_vector(optimized_dyn_plan.dynamics_states[t1_idx])
+            state_2 = eff_torquecontact_vector(optimized_dyn_plan.dynamics_states[t2_idx])
+        elif specification == 'TORQUES':
+            state_1 = eff_torque_vector(optimized_dyn_plan.dynamics_states[t1_idx])
+            state_2 = eff_torque_vector(optimized_dyn_plan.dynamics_states[t2_idx])
         elif specification == "COM":
             state_1 = optimized_sequence.kinematics_states[t1_idx].com
             state_2 = optimized_sequence.kinematics_states[t2_idx].com
@@ -94,11 +146,31 @@ def desired_state(specification, time_vector, optimized_sequence=None, dynamics_
         elif specification == "AMOM":
             state_1 = optimized_sequence.kinematics_states[t1_idx].amom
             state_2 = optimized_sequence.kinematics_states[t2_idx].amom
+        elif specification == "COMDY":
+            state_1 = optimized_dyn_plan.dynamics_states[t1_idx].com
+            state_2 = optimized_dyn_plan.dynamics_states[t2_idx].com
+        elif specification == "LMOMDY":
+            state_1 = optimized_dyn_plan.dynamics_states[t1_idx].lmom
+            state_2 = optimized_dyn_plan.dynamics_states[t2_idx].lmom
+        elif specification == "AMOMDY":
+            state_1 = optimized_dyn_plan.dynamics_states[t1_idx].amom
+            state_2 = optimized_dyn_plan.dynamics_states[t2_idx].amom
         elif specification == "DYN_FEEDBACK":
             state_1 = dynamics_feedback.forceGain(t1_idx)
             state_2 = dynamics_feedback.forceGain(t2_idx)
+        elif specification == "COP":
+            state_1 = eff_cop_vector(optimized_dyn_plan.dynamics_states[t1_idx])
+            state_2 = eff_cop_vector(optimized_dyn_plan.dynamics_states[t2_idx])
+        elif specification == "ENDEFFECTORORI":
+            state_1 = eff_ori_vector(optimized_dyn_plan.dynamics_states[t1_idx])
+            state_2 = eff_ori_vector(optimized_dyn_plan.dynamics_states[t2_idx])
+        #elif specification == "EFF_POSITION":
+        #    state_1 = kin_optimizer.optimized_motion_eff["trajectory"][t1_idx]#optimized_sequence.kinematics_states[t1_idx].eff_positions[1]
+        #    state_2 = kin_optimizer.optimized_motion_eff["trajectory"][t2_idx]
+        
 
         delta_t = t - time_vector[t1_idx]
+
         if t2_idx <= 0:
             state = state_1
         elif t1_idx >= len(time_vector) - 1:
@@ -135,7 +207,7 @@ def interpolate(specification, time_vector, optimized_motion_eff=None,\
         centroidal_moment = np.zeros(len(dynamic_state.effForce(0)))
         for eff_id in range(dynamic_state.effNum()):
             centroidal_moment += np.cross((dynamic_state.effPosition(eff_id) - dynamic_state.com)\
-            ,dynamic_state.effForce(eff_id)*robot_weight)
+            ,dynamic_state.effForce(eff_id)*robot_weight) + dynamic_state.effTorqueContact(eff_id) 
         return centroidal_moment
 
     def desired_state_eval(t):
@@ -190,6 +262,12 @@ def interpolate(specification, time_vector, optimized_motion_eff=None,\
         elif specification == "BASE_ANGULAR_VELOCITY":
             state_1 = optimized_sequence.kinematics_states[t1_idx].robot_velocity.generalized_joint_velocities[3:6]
             state_2 = optimized_sequence.kinematics_states[t2_idx].robot_velocity.generalized_joint_velocities[3:6]
+        elif specification == "ORI_RF":
+            state_1 = optimized_sequence.kinematics_states[t1_idx].robot_velocity.generalized_joint_velocities[3:6]
+            state_2 = optimized_sequence.kinematics_states[t2_idx].robot_velocity.generalized_joint_velocities[3:6]
+        elif specification == "ORI_LF":
+            state_1 = optimized_sequence.kinematics_states[t1_idx].rf_ori
+            state_2 = optimized_sequence.kinematics_states[t2_idx].lf_ori
 
         delta_t = t - time_vector[t1_idx]
         if t2_idx <= 0:
@@ -235,13 +313,13 @@ class MotionSimulator(object):
 
         urdf_base_string = str(os.path.dirname(os.path.abspath(__file__)))
         urdf_robot_string = (
-                os.path.join(rospkg.RosPack().get_path("robot_properties_solo"),
+                "/usr/local/lib/python3.6/dist-packages/robot_properties_tocabi/resources",
                     "urdf",
-                    "solo.urdf")
-        )
+                    "tocabi.urdf")
         planeId = p.loadURDF(os.path.join(urdf_base_string, "urdf", "plane_with_restitution.urdf"))
         cubeStartPos = [0, 0, floor_height]
         cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
+        print(urdf_robot_string)
         self.robotId = p.loadURDF(urdf_robot_string, cubeStartPos, cubeStartOrientation, flags=p.URDF_USE_INERTIA_FROM_FILE)
         cubePos, cubeOrn = p.getBasePositionAndOrientation(self.robotId)
 
@@ -261,12 +339,12 @@ class MotionSimulator(object):
         # Create the pinocchio robot.
         self.robot = QuadrupedWrapper()
 
-        self.controlled_joints = ['HL_HFE', 'HL_KFE', 'HR_HFE', 'HR_KFE', 'FL_HFE', 'FL_KFE', 'FR_HFE', 'FR_KFE']
+        self.controlled_joints = ["R_HipYaw_Link", "R_HipRoll_Joint", "R_HipPitch_Joint", "R_Knee_Joint", "R_AnklePitch_Joint", "R_AnkleRoll_Joint", "L_HipYaw_Link", "L_HipRoll_Joint", "L_HipPitch_Joint", "L_Knee_Joint", "L_AnklePitch_Joint", "L_AnkleRoll_Joint"]
 
         # Create the simulator for easier mapping between
         self.sim = Simulator(self.robotId, self.robot,
             self.controlled_joints,
-            ['HL_ANKLE', 'HR_ANKLE', 'FL_ANKLE', 'FR_ANKLE', ]
+            ["R_HipYaw_Link", "R_HipRoll_Joint", "R_HipPitch_Joint", "R_Knee_Joint", "R_AnklePitch_Joint", "R_AnkleRoll_Joint", "L_HipYaw_Link", "L_HipRoll_Joint", "L_HipPitch_Joint", "L_Knee_Joint", "L_AnklePitch_Joint", "L_AnkleRoll_Joint" ]
         )
 
 class MotionExecutor(MotionSimulator):
@@ -447,7 +525,7 @@ class MotionExecutor(MotionSimulator):
                     planned_force = np.zeros((3 * len(self.robot.effs)))
                     jacobians_effs = np.zeros((3 * len(self.robot.effs), self.robot.robot.nv))
                     for eff_id, eff in enumerate(self.robot.effs):
-                        eff = eff + "_ANKLE"
+                        #eff = eff + "_ANKLE"
                         force = self.optimized_dyn_plan.dynamics_states[time_id].effForce(eff_id) * robot_weight
                         # force = self.optimized_dyn_plan.dynamics_states[min(time_id - force_offset, len(self.time_vector) - 1)].effForce(eff_id) * robot_weight
                         # force = self.optimized_dyn_plan.dynamics_states[max(time_id - force_offset, 0)].effForce(eff_id) * robot_weight

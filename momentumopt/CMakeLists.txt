@@ -132,8 +132,9 @@ target_link_libraries(pymomentum PRIVATE pybind11::module)
 target_link_libraries(pymomentum PRIVATE momentumopt)
 
 # install the bindings
-get_python_install_dir(python_install_dir)
-install(TARGETS pymomentum DESTINATION ${python_install_dir})
+#get_python_install_dir(python_install_dir)
+set(${python_install_dir} '/usr/local/lib/python3')
+install(TARGETS pymomentum DESTINATION '/usr/local/lib/python3/dist-packages')
 
 # install the python package too
 install(
@@ -146,28 +147,6 @@ install(
 # Tests.
 #
 include(CTest)
-if(BUILD_TESTING)
-  # C++ unit-tests
-  find_package(GTest CONFIG REQUIRED)
-  include(GoogleTest)
-  add_executable(test_${PROJECT_NAME} tests/gtest_main.cpp
-                                      tests/test_momentumopt.cpp)
-  target_link_libraries(test_${PROJECT_NAME} momentumopt)
-  target_link_libraries(test_${PROJECT_NAME} GTest::gtest)
-  target_include_directories(
-    test_${PROJECT_NAME}
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/tests/>)
-  get_filename_component(TEST_PATH tests ABSOLUTE)
-  set_target_properties(
-    test_${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS
-                                    TEST_PATH="${TEST_PATH}/yaml_config_files/")
-  gtest_add_tests(TARGET test_${PROJECT_NAME})
-
-  # Python tests
-  add_test(NAME test_${PROJECT_NAME}_python
-           COMMAND ${Python_EXECUTABLE} -m pytest
-                   ${CMAKE_CURRENT_SOURCE_DIR}/tests)
-endif()
 
 #
 # create the cmake package

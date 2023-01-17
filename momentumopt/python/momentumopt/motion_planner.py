@@ -19,7 +19,8 @@ from pysolverlqr import *
 
 from pymomentum import *
 from momentumopt.kinoptpy.momentum_kinematics_optimizer import MomentumKinematicsOptimizer, EndeffectorTrajectoryGenerator
-from momentumopt.kinoptpy.create_data_file import create_file, create_qp_files, create_lqr_files
+from momentumopt.kinoptpy.create_data_file import create_file, create_file1, create_qp_files, create_lqr_files, create_lqr_files1
+from momentumopt.motion_execution import desired_state
 
 def create_time_vector(dynamics_sequence):
     num_time_steps = len(dynamics_sequence.dynamics_states)
@@ -36,6 +37,7 @@ class MotionPlanner():
     def __init__(self, cfg_file, KinOpt=MomentumKinematicsOptimizer,
                  RobotWrapper=QuadrupedWrapper, with_lqr=False):
         'define problem configuration'
+
         self.planner_setting = PlannerSetting()
         self.planner_setting.initialize(cfg_file)
 
@@ -47,9 +49,9 @@ class MotionPlanner():
         self.ini_state.fillInitialRobotState(cfg_file)
 
         'define reference dynamic sequence'
-        #self.kin_sequence = KinematicsSequence()
-        #self.kin_sequence.resize(self.planner_setting.get(PlannerIntParam_NumTimesteps),
-        #                         self.planner_setting.get(PlannerIntParam_NumDofs))
+        self.kin_sequence = KinematicsSequence()
+        self.kin_sequence.resize(self.planner_setting.get(PlannerIntParam_NumTimesteps),
+                                 self.planner_setting.get(PlannerIntParam_NumDofs))
 
         'define terrain description'
         self.terrain_description = TerrainDescription()
@@ -67,9 +69,9 @@ class MotionPlanner():
         'Kinematics Optimizer'
         self.kin_optimizer = KinOpt()
         self.kin_optimizer.initialize(self.planner_setting, RobotWrapper=RobotWrapper)
-
         self.dynamics_feedback = None
         self.with_lqr = with_lqr
+        self.kd_iter1 = 0
 
     def init_from_settings(self):
         kin_optimizer = self.kin_optimizer
@@ -236,11 +238,13 @@ class MotionPlanner():
             q = ks.robot_posture.generalized_joint_positions
             q_app = np.append(q_app,q.reshape(1,len(q)),axis=0)
 
-        for i in range(n_eff):
+        for i in range(1):#n_eff):
             for j in range(n_joints):
                 axes[i,j].plot(q_app[1:end,i*n_joints+j+7], label = "act")
-                axes[i,j].plot(self.kin_optimizer.joint_des[i*n_joints+j,:], label = "des")
+                #kin_optimizer.joint_des[i*n_joints+j,:]
+                axes[i,j].plot(self.kin_optimizer.q_kin[:,i*n_joints+j+7], label = "des")
                 axes[i,j].grid(True)
+                
 
         for i, label in enumerate(self.kin_optimizer.robot.effs):
             axes[i, 0].set_ylabel(label+ ' [rad]')
@@ -319,8 +323,10 @@ class MotionPlanner():
                 self.kin_optimizer.kinematics_sequence,
                 self.dyn_optimizer.dynamicsSequence(),
                 self.dynamics_feedback,
-                self.planner_setting.get(PlannerDoubleParam_RobotWeight))
+                self.planner_setting.get(PlannerDoubleParam_RobotWeight),
+                )
 
+        self.with_lqr = False
         if self.with_lqr:
             create_lqr_files(time_vector,
                              self.kin_optimizer.motion_eff,
@@ -355,13 +361,29 @@ class MotionPlanner():
             optimized_dyn_plan = self.dyn_optimizer.dynamicsSequence()
             if plot_com_motion:
                 self.plot_com_motion(optimized_dyn_plan.dynamics_states,
-                        optimized_kin_plan.kinematics_states, plot_show=False,
+                        optimized_kin_plan.kinematics_states, plot_show=True,
                         fig_suptitle='kd_iter={}'.format(kd_iter))
+        self.save_files1(0)
         optimized_kin_plan = kin_optimizer.kinematics_sequence
         optimized_dyn_plan = dyn_optimizer.dynamicsSequence()
         time_vector = create_time_vector(dyn_optimizer.dynamicsSequence())
+        self.with_lqr = True
         if self.with_lqr:
             self.optimize_dynamics_feedback()
         return optimized_kin_plan, kin_optimizer.motion_eff, \
                 optimized_dyn_plan, self.dynamics_feedback, \
                 self.planner_setting, time_vector
+
+    def save_files1(self, kd_iter):
+        time_vector = create_time_vector(self.dyn_optimizer.dynamicsSequence())
+        create_file1(time_vector, self.ini_state, self.kin_optimizer.kinematics_sequence, self.dyn_optimizer.dynamicsSequence(), self.dynamics_feedback, self.planner_setting.get(PlannerDoubleParam_RobotWeight), kd_iter)
+        self.with_lqr = True
+        if self.with_lqr:
+            create_lqr_files1(time_vector,
+                             self.kin_optimizer.motion_eff,
+                             self.kin_optimizer.kinematics_sequence,
+                             self.dyn_optimizer.dynamicsSequence(),
+                             self.dynamics_feedback,
+                             self.planner_setting.get(PlannerDoubleParam_RobotWeight), kd_iter)
+
+    

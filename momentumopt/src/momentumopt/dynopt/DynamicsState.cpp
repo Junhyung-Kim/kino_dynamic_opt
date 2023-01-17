@@ -17,13 +17,13 @@ namespace momentumopt {
       amom_(Eigen::Vector3d::Zero()),
       lmom_(Eigen::Vector3d::Zero()),
       amomd_(Eigen::Vector3d::Zero()),
-      lmomd_(Eigen::Vector3d::Zero())
+      lmomd_(Eigen::Vector3d::Zero()),
+      ZMP_(Eigen::Vector2d::Zero())
   {
     eff_positions_.clear();
     eff_velocities_.clear();
     eff_orientations_.clear();
     eff_accelerations_.clear();
-
 
 	for (int eff_id=0; eff_id<Problem::n_endeffs_; eff_id++)
 	{
@@ -31,15 +31,15 @@ namespace momentumopt {
       cnt_ids_[eff_id] = -1;
       eff_activations_[eff_id] = false;
 
-      eff_cops_.push_back(Eigen::Vector3d::Zero());
-	  eff_forces_.push_back(Eigen::Vector3d::Zero());
-	  eff_torques_.push_back(Eigen::Vector3d::Zero());
-	  eefs_trqs_contact_point_.push_back(Eigen::Vector3d::Zero());
+      eff_cops_.push_back(Eigen::Vector2d::Zero());
+      eff_forces_.push_back(Eigen::Vector3d::Zero());
+      eff_torques_.push_back(Eigen::Vector3d::Zero());
+      eefs_trqs_contact_point_.push_back(Eigen::Vector3d::Zero());
 
-	  eff_positions_.push_back(Eigen::Vector3d::Zero());
-	  eff_velocities_.push_back(Eigen::Vector3d::Zero());
-	  eff_accelerations_.push_back(Eigen::Vector3d::Zero());
-	  eff_orientations_.push_back(Eigen::Quaternion<double>::Identity());
+      eff_positions_.push_back(Eigen::Vector3d::Zero());
+      eff_velocities_.push_back(Eigen::Vector3d::Zero());
+      eff_accelerations_.push_back(Eigen::Vector3d::Zero());
+      eff_orientations_.push_back(Eigen::Quaternion<double>::Identity());
 	}
   }
 
@@ -73,6 +73,7 @@ namespace momentumopt {
 	  YAML::ReadParameter(ini_robo_cfg, "com", this->centerOfMass());
 	  YAML::ReadParameter(ini_robo_cfg, "lmom", this->linearMomentum());
 	  YAML::ReadParameter(ini_robo_cfg, "amom", this->angularMomentum());
+	  YAML::ReadParameter(ini_robo_cfg, "zmp", this->ZMP());
 
 	  for (int eff_id=0; eff_id<Problem::n_endeffs_; eff_id++) {
 		Eigen::VectorXd eef_cfg = YAML::ReadParameter<Eigen::VectorXd>(ini_robo_cfg["eef_pose"], "eef_"+Problem::idToEndeffectorString(eff_id));

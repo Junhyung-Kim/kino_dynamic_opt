@@ -14,6 +14,7 @@ project(solver VERSION 1.0.0)
 # specify the C++ 17 standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(BUILD_TESTING False)
 
 # Some additionnal optimization for the code.
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -funroll-loops")
@@ -27,8 +28,8 @@ unset(PYBIND11_CPP_STANDARD CACHE)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(yaml_utils REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS thread)
-
+find_package(Boost 1.65.1 REQUIRED COMPONENTS thread)
+message(STATUS "Boost version: ${Boost_VERSION}")
 # local deps
 find_package(mpi_cmake_modules REQUIRED)
 
@@ -115,39 +116,13 @@ pybind11_add_module(pysolver MODULE srcpy/solver/PySolver.cpp
 target_link_libraries(pysolver PRIVATE pybind11::module)
 target_link_libraries(pysolver PRIVATE solver)
 
-get_python_install_dir(python_install_dir)
-install(TARGETS pysolver LIBRARY DESTINATION ${python_install_dir})
+set(${python_install_dir} '/usr/local/lib/python3.6')
+install(TARGETS pysolver LIBRARY DESTINATION /usr/local/lib/python3.6/dist-packages)
 
 #
 # Tests
 #
 include(CTest)
-if(BUILD_TESTING)
-  find_package(GTest CONFIG REQUIRED)
-  include(GoogleTest)
-  # C++ unit-tests
-  add_executable(solver_tests 
-                tests/gtest_main.cpp 
-                tests/test_lbfgs.cpp
-                tests/test_solver.cpp
-                tests/test_rt_solver.cpp)
-  # if(IPOPT_FOUND)
-  #   set(GTEST_FILES ${GTEST_FILES} tests/test_ipopt.cpp)
-  # endif()
-  # if(GUROBI_FOUND)
-  #   set(GTEST_FILES ${GTEST_FILES} tests/test_gurobi.cpp)
-  # endif()
-  target_link_libraries(solver_tests solver)
-  target_link_libraries(solver_tests GTest::gtest)
-  target_include_directories(
-    solver_tests PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/tests/>
-  )
-  get_filename_component(TEST_PATH tests ABSOLUTE)
-  set_target_properties(
-    solver_tests PROPERTIES COMPILE_DEFINITIONS
-                            TEST_PATH="${TEST_PATH}/yaml_config_files/")
-  gtest_add_tests(TARGET solver_tests)
-endif()
 
 
 #

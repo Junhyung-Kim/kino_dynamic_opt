@@ -10,6 +10,7 @@
 '''
 
 import sys
+sys.path.append('/home/jhk/kino_dynamic_opt/momentumopt/python')
 from momentumopt.kino_dyn_planner import main
 
 if __name__ == "__main__":

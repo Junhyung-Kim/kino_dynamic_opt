@@ -82,7 +82,7 @@ planner_variables:
 
   load_kinematics: true
 
-  display_motion: true
+  display_motion: False
   num_dofs: 6
   # Number of dynamic and kinematic optimization iterations
   kd_iterations: 1
@@ -235,7 +235,7 @@ planner_variables:
   w_com: [1000., 1000.0, 1000] #cost weight of final com position
   w_amom: [0.010, 1.0, 0.010]
   w_lmom: [0.1, 0.1, 0.1]
-  w_amomd: [0.100, 0.142, 0.100]
+  w_amomd: [0.800, 0.842, 0.100]
   w_lmomd: [0.005, 0.1, 0.005]
   w_amom_final: [10.00, 10.0, 10.00] # cost weight of final linear momentum
   w_lmom_final: [10.00, 10.0, 100.00] # cost weight of final angular momentum
@@ -270,8 +270,8 @@ planner_variables:
   w_kin_default_joints: [1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8]
   w_kin_joint_vel: [1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-8, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6,
     1e-6, 1e-6, 1e-6]
-  w_kin_joint_acc: [1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-8, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6,
-    1e-6, 1e-6, 1e-6]
+  w_kin_joint_acc: [1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3,
+    1e-3, 1e-3, 1e-3]
                           # base                                 # joints
 
   #######################
@@ -337,7 +337,7 @@ solverlqr_dynamics:
     com_tracking: [1.0, 1.42, 1.0]
     lmom_tracking: [0.1, 0.142, 0.1]
     amom_tracking: [0.1, 0.142, 0.1]
-    com_final_tracking: [1.0, 0.0, 1.0]
+    com_final_tracking: [10.0, 10.0, 10.0]
     lmom_final_tracking: [0.1, 0., 0.1]
     amom_final_tracking: [0.1, 0., 0.1]
 

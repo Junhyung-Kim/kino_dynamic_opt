@@ -111,7 +111,6 @@ namespace momentumopt {
   {
     lqr_stg_ = &lqr_stg;
     plan_stg_ = &plan_stg;
-
     dynamics_description_.initialize(lqr_stg);
     dynamics_description_.setPlannerSetting(plan_stg);
     dynamics_lqrsolver_.initialize(&dynamics_description_, lqr_stg);

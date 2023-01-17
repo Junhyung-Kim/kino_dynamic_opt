@@ -49,9 +49,10 @@ void init_dynamics(py::module &m)
     .def("fillInitialRobotState", &DynamicsState::fillInitialRobotState, py::arg("cfg_file"), py::arg("robot_state") = "initial_robot_configuration")
 
     .def("eff", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorPosition)
-    .def("effCoP", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorCoP)
+    .def("effCoP", (const Eigen::Vector2d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorCoP)
     .def("effForce", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorForce)
     .def("effTorque", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorTorque)
+    .def("effTorqueContact", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorTorqueAtContactPoint)
 
     .def("effNum", (long (DynamicsState::*)() const) &DynamicsState::endeffectorNum)
 
@@ -59,6 +60,8 @@ void init_dynamics(py::module &m)
     .def("effVelocity", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorVelocity)
     .def("effAcceleration", (const Eigen::Vector3d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorAcceleration)
     .def("effOrientation", (const Eigen::Quaternion<double>& (DynamicsState::*)(int) const) &DynamicsState::endeffectorOrientation)
+    .def("effOrientationEigen", (const Eigen::Vector4d& (DynamicsState::*)(int) const) &DynamicsState::endeffectorOrientationEigen)
+    
     .def("effActivation", (bool (DynamicsState::*)(int) const) &DynamicsState::endeffectorActivation)
 
     .def("setEffPosition", &setEffPosition, py::arg("EffId"), py::arg("position"))
