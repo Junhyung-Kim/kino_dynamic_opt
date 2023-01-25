@@ -110,21 +110,21 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so")
+  if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so")
     file(RPATH_CHECK
-         FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so"
+         FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so"
          RPATH "/usr/local/lib:/usr/local/lib/dynamic_graph_plugins")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'" TYPE MODULE FILES "/home/jhk/kino_dynamic_opt/momentumopt/build/pymomentum.cpython-36m-x86_64-linux-gnu.so")
-  if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'" TYPE MODULE FILES "/home/jhk/kino_dynamic_opt/momentumopt/build/pymomentum.cpython-36m-x86_64-linux-gnu.so")
+  if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so")
     file(RPATH_CHANGE
-         FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so"
+         FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so"
          OLD_RPATH "/home/jhk/kino_dynamic_opt/momentumopt/build:/usr/local/lib:"
          NEW_RPATH "/usr/local/lib:/usr/local/lib/dynamic_graph_plugins")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so")
+      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/'/usr/local/lib/python3.6/dist-packages'/pymomentum.cpython-36m-x86_64-linux-gnu.so")
     endif()
   endif()
 endif()

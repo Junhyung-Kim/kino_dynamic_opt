@@ -77,7 +77,7 @@ class Polynomial:
     def fit(self):
         if len(self.constraints) == 0:
             raise ValueError("No constraints specificed yet.")
-
+        
         A = np.zeros((self.order + 1, self.order + 1))
         b = np.zeros((self.order + 1))
 
@@ -96,9 +96,9 @@ class Polynomial:
                 raise ValueError("Derivative not specificed")
 
             b[i] = constraint[1]
-
+        
         x = np.linalg.solve(A, b)
-        # self.coeffs = coeff.copy()
+        
         self.coeffs[:, 0] = x
         self.fitted = True
 
@@ -128,6 +128,7 @@ def create_constraints(t, x, via=None):
         via = 0.5 * (x_1 - x_0) + x_0
 
     constraints = np.zeros((7, 3))
+
     # constraints[i, :] = [t, x, order of derivative]
     constraints[0, :] = [t_0, x_0, 0]
     constraints[1, :] = [t_0, 0.0, 1]
@@ -136,6 +137,41 @@ def create_constraints(t, x, via=None):
     constraints[4, :] = [t_1, x_1, 0]
     constraints[5, :] = [t_1, 0.0, 1]
     constraints[6, :] = [t_1, 0.0, 2]
+
+    return constraints
+
+def create_constraints1(t, x, y, z, via=None):
+    # Generate minimum jerk trajectories for endeffector motion by
+    # fitting a polynomial for every dimension (x, y, z).
+    # t_0: Time when endeffector switches from being in contact to not being in contact
+    # t_1: Time when endeffector switches from being not in contact to being in contact
+    # Example for the endeffector motion in z:
+    # f_z(t_0) = z_0
+    # f_z'(t_0) = 0  # zero velocity when in contact
+    # f_z"(t_0) = 0  # zero acceleration when in contact
+    # f_z(0.5 * (t_1 - t_0) + t_0) = 0.5 * (z_1 - z_0) + z_0 OR f_z(0.5 * (t_1 - t_0) + t_0) = z_max
+    # f_z(t_1) = z_1
+    # f_z'(t_1) = 0  # zero velocity when in contact
+    # f_z"(t_1) = 0  # zero acceleration when in contact
+
+    t_0 = t[0]
+    t_1 = t[1]
+    x_0 = x[0]
+    x_1 = x[1]
+    y_0 = y[0]
+    y_1 = y[1]
+    z_0 = z[0]
+    z_1 = z[1]
+
+    constraints = np.zeros((6, 5))
+
+    # constraints[i, :] = [t, x, order of derivative]
+    constraints[0, :] = [t_0, x_0, y_0, z_0, 0]
+    constraints[1, :] = [t_0, 0.0, 0.0, 0.0, 1]
+    constraints[2, :] = [t_0, 0.0, 0.0, 0.0, 2]
+    constraints[3, :] = [t_1, x_1,  y_1, z_1, 0]
+    constraints[4, :] = [t_1, 0.0, 0.0, 0.0, 1]
+    constraints[5, :] = [t_1, 0.0, 0.0, 0.0, 2]
 
     return constraints
 
@@ -154,6 +190,9 @@ def poly_points(t, y_from, y_to, via=None):
     poly.fit()
     return poly
 
+def poly_points1(t, x_from, x_to, y_from, y_to, z_from, z_to, via=None):
+    constraints = create_constraints1(t, [x_from, x_to], [y_from, y_to], [z_from, z_to], via=via)
+    return constraints
 
 class PolynominalList(object):
     '''

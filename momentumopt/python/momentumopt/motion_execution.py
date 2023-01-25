@@ -257,7 +257,7 @@ def interpolate(specification, time_vector, optimized_motion_eff=None,\
             state_1 = centroidal_moment_vector(optimized_dyn_plan.dynamics_states[t1_idx], robot_weight)
             state_2 = centroidal_moment_vector(optimized_dyn_plan.dynamics_states[t2_idx], robot_weight)
         elif specification == "QUATERNION":
-            state_1 = optimized_sequence.kinematics_states[t1_idx].robot_posture.generalized_joint_positions[3:7]
+            state_1 = optimized_sequence.kinematics_states[t1_idx].generalized_joint_positions[3:7]
             state_2 = optimized_sequence.kinematics_states[t2_idx].robot_posture.generalized_joint_positions[3:7]
         elif specification == "BASE_ANGULAR_VELOCITY":
             state_1 = optimized_sequence.kinematics_states[t1_idx].robot_velocity.generalized_joint_velocities[3:6]

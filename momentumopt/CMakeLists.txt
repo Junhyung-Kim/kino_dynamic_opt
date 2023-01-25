@@ -14,10 +14,10 @@ project(momentumopt)
 # specify the C++ 17 standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Some additionnal optimization for the code.
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -funroll-loops -fPIC")
-
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -funroll-loops -fPIC -march=native")
 #
 # Dependencies
 #
@@ -133,8 +133,8 @@ target_link_libraries(pymomentum PRIVATE momentumopt)
 
 # install the bindings
 #get_python_install_dir(python_install_dir)
-set(${python_install_dir} '/usr/local/lib/python3')
-install(TARGETS pymomentum DESTINATION '/usr/local/lib/python3/dist-packages')
+set(${python_install_dir} '/usr/local/lib/python3.6')
+install(TARGETS pymomentum DESTINATION '/usr/local/lib/python3.6/dist-packages')
 
 # install the python package too
 install(

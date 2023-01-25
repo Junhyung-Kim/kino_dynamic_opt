@@ -1,25 +1,25 @@
 Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
-Change Dir: /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-ZoWiKJ
+Change Dir: /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-mTVhCN
 
-Run Build Command(s):/usr/bin/make -f Makefile cmTC_d9c54/fast && /usr/bin/make  -f CMakeFiles/cmTC_d9c54.dir/build.make CMakeFiles/cmTC_d9c54.dir/build
-make[1]: Entering directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-ZoWiKJ'
-Building C object CMakeFiles/cmTC_d9c54.dir/src.c.o
-/usr/bin/cc -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_d9c54.dir/src.c.o -c /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-ZoWiKJ/src.c
-Linking C executable cmTC_d9c54
-/home/jhk/.local/lib/python3.6/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d9c54.dir/link.txt --verbose=1
-/usr/bin/cc CMakeFiles/cmTC_d9c54.dir/src.c.o -o cmTC_d9c54 
-CMakeFiles/cmTC_d9c54.dir/src.c.o: In function `main':
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_4fefb/fast && /usr/bin/make  -f CMakeFiles/cmTC_4fefb.dir/build.make CMakeFiles/cmTC_4fefb.dir/build
+make[1]: Entering directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-mTVhCN'
+Building C object CMakeFiles/cmTC_4fefb.dir/src.c.o
+/usr/bin/cc -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_4fefb.dir/src.c.o -c /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-mTVhCN/src.c
+Linking C executable cmTC_4fefb
+/home/jhk/.local/lib/python3.6/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4fefb.dir/link.txt --verbose=1
+/usr/bin/cc CMakeFiles/cmTC_4fefb.dir/src.c.o -o cmTC_4fefb 
+CMakeFiles/cmTC_4fefb.dir/src.c.o: In function `main':
 src.c:(.text+0x3e): undefined reference to `pthread_create'
 src.c:(.text+0x4a): undefined reference to `pthread_detach'
 src.c:(.text+0x56): undefined reference to `pthread_cancel'
 src.c:(.text+0x67): undefined reference to `pthread_join'
 src.c:(.text+0x7b): undefined reference to `pthread_atfork'
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_d9c54.dir/build.make:98: recipe for target 'cmTC_d9c54' failed
-make[1]: *** [cmTC_d9c54] Error 1
-make[1]: Leaving directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-ZoWiKJ'
-Makefile:127: recipe for target 'cmTC_d9c54/fast' failed
-make: *** [cmTC_d9c54/fast] Error 2
+CMakeFiles/cmTC_4fefb.dir/build.make:98: recipe for target 'cmTC_4fefb' failed
+make[1]: *** [cmTC_4fefb] Error 1
+make[1]: Leaving directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-mTVhCN'
+Makefile:127: recipe for target 'cmTC_4fefb/fast' failed
+make: *** [cmTC_4fefb/fast] Error 2
 
 
 Source file was:
@@ -45,22 +45,22 @@ int main(void)
 
 
 Determining if the function pthread_create exists in the pthreads failed with the following output:
-Change Dir: /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-1IQ9qZ
+Change Dir: /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-eaCfQW
 
-Run Build Command(s):/usr/bin/make -f Makefile cmTC_357ac/fast && /usr/bin/make  -f CMakeFiles/cmTC_357ac.dir/build.make CMakeFiles/cmTC_357ac.dir/build
-make[1]: Entering directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-1IQ9qZ'
-Building C object CMakeFiles/cmTC_357ac.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create -o CMakeFiles/cmTC_357ac.dir/CheckFunctionExists.c.o -c /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-1IQ9qZ/CheckFunctionExists.c
-Linking C executable cmTC_357ac
-/home/jhk/.local/lib/python3.6/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_357ac.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_357ac.dir/CheckFunctionExists.c.o -o cmTC_357ac  -lpthreads 
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_d1bdb/fast && /usr/bin/make  -f CMakeFiles/cmTC_d1bdb.dir/build.make CMakeFiles/cmTC_d1bdb.dir/build
+make[1]: Entering directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-eaCfQW'
+Building C object CMakeFiles/cmTC_d1bdb.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create -o CMakeFiles/cmTC_d1bdb.dir/CheckFunctionExists.c.o -c /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-eaCfQW/CheckFunctionExists.c
+Linking C executable cmTC_d1bdb
+/home/jhk/.local/lib/python3.6/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1bdb.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_d1bdb.dir/CheckFunctionExists.c.o -o cmTC_d1bdb  -lpthreads 
 /usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_357ac.dir/build.make:98: recipe for target 'cmTC_357ac' failed
-make[1]: *** [cmTC_357ac] Error 1
-make[1]: Leaving directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-1IQ9qZ'
-Makefile:127: recipe for target 'cmTC_357ac/fast' failed
-make: *** [cmTC_357ac/fast] Error 2
+CMakeFiles/cmTC_d1bdb.dir/build.make:98: recipe for target 'cmTC_d1bdb' failed
+make[1]: *** [cmTC_d1bdb] Error 1
+make[1]: Leaving directory '/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/CMakeScratch/TryCompile-eaCfQW'
+Makefile:127: recipe for target 'cmTC_d1bdb/fast' failed
+make: *** [cmTC_d1bdb/fast] Error 2
 
 
 

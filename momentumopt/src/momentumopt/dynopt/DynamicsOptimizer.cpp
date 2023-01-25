@@ -86,7 +86,7 @@ namespace momentumopt {
     std::cout << "lm" << this->dynamicsSequence().dynamicsState(i).linearMomentum() << std::endl;
     std::cout << "ZMP" << this->dynamicsSequence().dynamicsState(i).endeffectorCoP(0) << std::endl;
   }
-
+  std::cout << ini_state_.centerOfMass() << std::endl;
 	//this->saveToFile(kin_sequence);
     return exitcode_;
   }
@@ -118,15 +118,15 @@ namespace momentumopt {
       }
       // adding quadratic objective
       quad_objective_.clear();
-
+/*
       if (this->getSetting().get(PlannerIntParam_NumViapoints) > 0) {
         for (int via_id=0; via_id<this->getSetting().get(PlannerIntParam_NumViapoints); via_id++)
           for (int axis_id=0; axis_id<3; axis_id++)
         	    quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightCenterOfMassViapoint)[axis_id], LinExpr(vars_[com_.id(axis_id,int(this->getSetting().get(PlannerCVectorParam_Viapoints)[via_id](0)/this->getSetting().get(PlannerDoubleParam_TimeStep)))]) - LinExpr(this->getSetting().get(PlannerCVectorParam_Viapoints)[via_id](axis_id+1)) );
       }
-
+*/
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
-        for (int axis_id=0; axis_id<3; axis_id++) {
+        for (int axis_id=0; axis_id<2; axis_id++) {
           // penalty on center of mass, linear and angular momentum with Kinematics
           if (time_id==this->getSetting().get(PlannerIntParam_NumTimesteps)-1) {
             quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightCenterOfMass)[axis_id], LinExpr(vars_[com_.id(axis_id,time_id)]) - LinExpr(com_pos_goal_[axis_id]));
@@ -163,7 +163,6 @@ namespace momentumopt {
       bool zmp_bool = true;
       // center of mass above endeffector positions, ZMP constraint
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
-        model_.addLinConstr(LinExpr(vars_[com_.id(2,time_id)]) - LinExpr(this->contactLocation(0, 0, 2)), "=", this->getSetting().get(PlannerDoubleParam_MinRelHeight));
         double ZMP_ux, ZMP_lx, ZMP_uy, ZMP_ly;
         for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
           if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
@@ -213,14 +212,23 @@ namespace momentumopt {
           }
         }
         
-        if (time_id==0) { lin_cons_ = (LinExpr(vars_[lmom_.id(0,time_id)]) - LinExpr(ini_state_.linearMomentum()[0]))*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(ini_state_.centerOfMass()[0]-ini_state_.ZMP()[0])+ini_state_.angularMomentumRate()[1]/78.8188;}
+      /*  if (time_id==0) { lin_cons_ = (LinExpr(vars_[lmom_.id(0,time_id)]) - LinExpr(ini_state_.linearMomentum()[0]))*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(ini_state_.centerOfMass()[0]-ini_state_.ZMP()[0])+ini_state_.angularMomentumRate()[1]/78.8188;}
         else            { lin_cons_ = (LinExpr(vars_[lmom_.id(0,time_id)]) - LinExpr(vars_[lmom_.id(0,time_id - 1)]))*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(0,time_id-1)])-LinExpr(vars_[ZMP_.id(0,time_id-1)]))+LinExpr(vars_[amomd_.id(1,time_id-1)])/78.8188;}
         model_.addLinConstr(lin_cons_, "=", 0.0);
 
         if (time_id==0) { lin_cons_ = (LinExpr(vars_[lmom_.id(1,time_id)]) - LinExpr(ini_state_.linearMomentum()[1]))*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(ini_state_.centerOfMass()[1]-ini_state_.ZMP()[1])-ini_state_.angularMomentumRate()[0]/78.8188;}
         else            { lin_cons_ = (LinExpr(vars_[lmom_.id(1,time_id)]) - LinExpr(vars_[lmom_.id(1,time_id - 1)]))*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(1,time_id-1)])-LinExpr(vars_[ZMP_.id(1,time_id-1)]))-LinExpr(vars_[amomd_.id(0,time_id-1)])/78.8188;}
         model_.addLinConstr(lin_cons_, "=", 0.0);
+*/
+      //  if (time_id==0) { lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(ini_state_.centerOfMass()[0]-ini_state_.ZMP()[0])+ini_state_.angularMomentumRate()[1]/78.8188;}
+      //  else            { lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(0,time_id-1)])-LinExpr(vars_[ZMP_.id(0,time_id-1)]))+LinExpr(vars_[amomd_.id(1,time_id-1)])/78.8188;}
+        lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(0,time_id)])-LinExpr(vars_[ZMP_.id(0,time_id)]))+LinExpr(vars_[amomd_.id(1,time_id)])/78.8188;
+        model_.addLinConstr(lin_cons_, "=", 0.0);
 
+        //if (time_id==0) { lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(ini_state_.centerOfMass()[1]-ini_state_.ZMP()[1])-ini_state_.angularMomentumRate()[0]/78.8188;}
+        //else            { lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(1,time_id-1)])-LinExpr(vars_[ZMP_.id(1,time_id-1)]))-LinExpr(vars_[amomd_.id(0,time_id-1)])/78.8188;}
+        lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(1,time_id)])-LinExpr(vars_[ZMP_.id(1,time_id)]))-LinExpr(vars_[amomd_.id(0,time_id)])/78.8188;
+        model_.addLinConstr(lin_cons_, "=", 0.0);
 
       }
 
@@ -251,6 +259,9 @@ namespace momentumopt {
           else            { lin_cons_ = LinExpr(vars_[amom_.id(axis_id,time_id)]) - LinExpr(vars_[amom_.id(axis_id,time_id-1)])    - LinExpr(vars_[amomd_.id(axis_id,time_id)])*dynamicsSequence().dynamicsState(time_id).time(); }
           model_.addLinConstr(lin_cons_, "=", 0.0);
         }
+
+        lin_cons_ = LinExpr(vars_[com_.id(2,time_id)]) - LinExpr(ini_state_.centerOfMass()[2]); 
+        model_.addLinConstr(lin_cons_, "=", 0.0);
       }
 
 	  QuadConstrApprox qapprox = QuadConstrApprox::None;
@@ -320,20 +331,29 @@ namespace momentumopt {
     com_.getGuessValue(mat_guess_);
     dynamicsSequence().dynamicsState(0).centerOfMass() = Eigen::Vector3d(mat_guess_.block<3,1>(0,0));
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
-        dynamicsSequence().dynamicsState(time_id+1).centerOfMass() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
+        dynamicsSequence().dynamicsState(time_id).centerOfMass() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
 
     lmom_.getGuessValue(mat_guess_);
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
-        dynamicsSequence().dynamicsState(time_id+1).linearMomentum() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
+        dynamicsSequence().dynamicsState(time_id).linearMomentum() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
+
+    lmomd_.getGuessValue(mat_guess_);
+      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        dynamicsSequence().dynamicsState(time_id).linearMomentumRate() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
+
+    amomd_.getGuessValue(mat_guess_);
+      for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
+        dynamicsSequence().dynamicsState(time_id).angularMomentumRate() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
 
     amom_.getGuessValue(mat_guess_);
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
-        dynamicsSequence().dynamicsState(time_id+1).angularMomentum() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
+        dynamicsSequence().dynamicsState(time_id).angularMomentum() = Eigen::Vector3d(mat_guess_.block<3,1>(0,time_id));
 
     ZMP_.getGuessValue(mat_guess_);
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
       {
-          dynamicsSequence().dynamicsState(time_id).endeffectorCoP(0) = Eigen::Vector2d(mat_guess_.block<2,1>(0,time_id));
+        dynamicsSequence().dynamicsState(time_id).endeffectorCoP(0) = Eigen::Vector2d(mat_guess_.block<2,1>(0,time_id));
+        dynamicsSequence().dynamicsState(time_id).ZMP() = Eigen::Vector2d(mat_guess_.block<2,1>(0,time_id));
       }
   }
 

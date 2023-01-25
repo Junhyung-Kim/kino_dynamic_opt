@@ -6,5 +6,5 @@ CXX_DEFINES = -DBOOST_ALL_NO_LIB -DBOOST_THREAD_DYN_LINK -DCFG_PATH=\"share/solv
 
 CXX_INCLUDES = -I/home/jhk/kino_dynamic_opt/momentumopt/include -isystem /usr/local/include/eigen3
 
-CXX_FLAGS =  -Wl,--no-as-needed -Wall -Wextra -Wpedantic -fPIC -std=gnu++1z
+CXX_FLAGS =  -Wl,--no-as-needed -Wall -Wextra -Wpedantic -fPIC -std=c++1z
 

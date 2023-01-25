@@ -99,14 +99,16 @@ def create_file1(time_vector, ini_state, optimized_sequence, optimized_dyn_plan,
 
     num_points = int(round(time_vector[-1] * sample_frequency))
     using_quadruped = True
-    print("qqqq")
-    print(np.hstack([ini_state.com, ini_state.lmom, ini_state.amom, ini_state.amomd]))
-
+    init_pos = np.vstack([ini_state.com, ini_state.lmom, ini_state.amom, ini_state.amomd])
+    init_pos = init_pos.reshape(1,12)
 
     def dump_data(output_file, desired_fn, scale=1.):
         np.savetxt(output_file, np.vstack([
             np.hstack((i, scale * desired_fn(i / 1e3))) for i in range(num_points)
         ]), fmt='%.8e')
+
+    def dump_data1(output_file, desired_fn, scale=1.):
+        np.savetxt(output_file, desired_fn, fmt='%.8e')
 
     if using_quadruped:
         iter = str(kd_iter)
@@ -136,6 +138,8 @@ def create_file1(time_vector, ini_state, optimized_sequence, optimized_dyn_plan,
         dump_data(text, desired_cop)
         text = "quadruped_end_ori" + iter + ".dat"
         dump_data(text, desired_eori)
+        text = "initpos" + iter + ".dat"
+        dump_data1(text, init_pos)
         #    dump_data("quadruped_EFF.dat", desired_EFF)
             # dump_data("quadruped_dyn_feedback.dat", desired_dyn_feedback)
     else:  # using teststand

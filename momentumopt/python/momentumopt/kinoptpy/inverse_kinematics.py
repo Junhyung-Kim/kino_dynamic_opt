@@ -29,7 +29,6 @@ class PointContactInverseKinematics(object):
         self.endeff_frame_names = endeff_frame_names
         self.endeff_ids = [getFrameId(name) for name in endeff_frame_names]
         self.is_init_time=1
-
         self.ne = len(self.endeff_ids)
         self.nv = self.model.nv
 

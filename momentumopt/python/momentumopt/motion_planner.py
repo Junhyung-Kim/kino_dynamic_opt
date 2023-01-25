@@ -21,6 +21,10 @@ from pymomentum import *
 from momentumopt.kinoptpy.momentum_kinematics_optimizer import MomentumKinematicsOptimizer, EndeffectorTrajectoryGenerator
 from momentumopt.kinoptpy.create_data_file import create_file, create_file1, create_qp_files, create_lqr_files, create_lqr_files1
 from momentumopt.motion_execution import desired_state
+import pickle
+from copy import copy
+
+np.set_printoptions(precision=3)
 
 def create_time_vector(dynamics_sequence):
     num_time_steps = len(dynamics_sequence.dynamics_states)
@@ -68,10 +72,26 @@ class MotionPlanner():
 
         'Kinematics Optimizer'
         self.kin_optimizer = KinOpt()
+        #self.KinematicsInterface = KinematicsInterface() KinematicsOptimizer()#
+        #self.KinematicsInterface.initialize(self.planner_setting)
+        #self.KinematicsInterface.internalInitialization(self.planner_setting)
         self.kin_optimizer.initialize(self.planner_setting, RobotWrapper=RobotWrapper)
         self.dynamics_feedback = None
         self.with_lqr = with_lqr
         self.kd_iter1 = 0
+
+        self.crocs_data = dict()
+        self.crocs_data['Right'] = dict()
+        #self.crocs_data['foot_poses'] = []
+        #self.crocs_data['trajs'] = []
+        #self.crocs_data['x'] = []
+        #self.crocs_data['vel_trajs'] = [] 
+        self.crocs_data['Right']['x_inputs'] = []
+        self.crocs_data['Right']['x_state'] = []        
+        self.crocs_data['Right']['u_trajs'] = []
+        #self.crocs_data['data_phases_set'] = []
+       # self.crocs_data['costs'] = []
+        #self.crocs_data['iters'] = []
 
     def init_from_settings(self):
         kin_optimizer = self.kin_optimizer
@@ -354,20 +374,66 @@ class MotionPlanner():
         dyn_optimizer = self.dyn_optimizer
         kin_optimizer = self.kin_optimizer
         self.optimize_dynamics(0)
+        #
+        bool_iter = True
+        kd_iter = 0
         for kd_iter in range(0, self.planner_setting.get(PlannerIntParam_KinDynIterations)):
             self.optimize_kinematics(kd_iter + 1, plotting=False)
             self.optimize_dynamics(kd_iter + 1)
             optimized_kin_plan = self.kin_optimizer.kinematics_sequence
             optimized_dyn_plan = self.dyn_optimizer.dynamicsSequence()
-            if plot_com_motion:
-                self.plot_com_motion(optimized_dyn_plan.dynamics_states,
-                        optimized_kin_plan.kinematics_states, plot_show=True,
-                        fig_suptitle='kd_iter={}'.format(kd_iter))
-        self.save_files1(0)
+            '''
+            for i in range(0, self.planner_setting.get(PlannerIntParam_NumTimesteps)):
+                if(abs(optimized_dyn_plan.dynamics_states[i].com[2] - optimized_kin_plan.kinematics_states[i].com[2]) < 0.01):
+                    bool_iter = False
+                else:
+                    print("ccc")
+                    print(i)
+                    print(abs(optimized_dyn_plan.dynamics_states[i].com[2] - optimized_kin_plan.kinematics_states[i].com[2]) )
+                
+                    bool_iter = False
+                    break
+            '''
+            #if kd_iter == 0:
+            #    bool_iter = False
+            kd_iter = kd_iter + 1
+            #if plot_com_motion:
+            #    self.plot_com_motion(optimized_dyn_plan.dynamics_states,
+            #           optimized_kin_plan.kinematics_states, plot_show=True,
+            #            fig_suptitle='kd_iter={}'.format(kd_iter))
+        
+        
+        #self.save_files1(0)
         optimized_kin_plan = kin_optimizer.kinematics_sequence
         optimized_dyn_plan = dyn_optimizer.dynamicsSequence()
+
+        init_pos = np.hstack([optimized_kin_plan.kinematics_states[0].robot_posture.generalized_joint_positions, optimized_kin_plan.kinematics_states[0].robot_velocity.generalized_joint_velocities, self.ini_state.com[0], self.ini_state.lmom[0]/95.941282, self.ini_state.zmp[0], self.ini_state.amom[1], self.ini_state.com[1],  self.ini_state.lmom[1]/95.941282, self.ini_state.zmp[1],self.ini_state.amom[0]])
+        init_pos = init_pos.reshape(1,45)
+
+        x_pos = np.zeros((self.planner_setting.get(PlannerIntParam_NumTimesteps), 45))
+        u_pos = np.zeros((self.planner_setting.get(PlannerIntParam_NumTimesteps), 22))
+        for i in range(0, self.planner_setting.get(PlannerIntParam_NumTimesteps)):
+            x_stack = np.hstack([optimized_kin_plan.kinematics_states[i].robot_posture.generalized_joint_positions, optimized_kin_plan.kinematics_states[i].robot_velocity.generalized_joint_velocities, optimized_dyn_plan.dynamics_states[i].com[0], optimized_dyn_plan.dynamics_states[i].lmom[0]/95.941282,optimized_dyn_plan.dynamics_states[i].zmp[0],  optimized_dyn_plan.dynamics_states[i].amom[1],optimized_dyn_plan.dynamics_states[i].com[1], optimized_dyn_plan.dynamics_states[i].lmom[1]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[1], optimized_dyn_plan.dynamics_states[i].amom[0]])
+            x_stack = x_stack.reshape(1,45)
+            x_pos[i] = x_stack
+
+        for i in range(0, self.planner_setting.get(PlannerIntParam_NumTimesteps)):
+            if i == 0:
+                u_stack = np.hstack([optimized_kin_plan.kinematics_states[i].robot_velocity.generalized_joint_velocities / self.planner_setting.get(PlannerDoubleParam_TimeStep), (optimized_dyn_plan.dynamics_states[i].zmp[0] - self.ini_state.zmp[0]) / self.planner_setting.get(PlannerDoubleParam_TimeStep),  optimized_dyn_plan.dynamics_states[i].amomd[1],  (optimized_dyn_plan.dynamics_states[i].zmp[1] - self.ini_state.zmp[1]) / self.planner_setting.get(PlannerDoubleParam_TimeStep), optimized_dyn_plan.dynamics_states[i].amomd[0]])
+            else:
+                u_stack = np.hstack([(optimized_kin_plan.kinematics_states[i].robot_velocity.generalized_joint_velocities - optimized_kin_plan.kinematics_states[i-1].robot_velocity.generalized_joint_velocities) / self.planner_setting.get(PlannerDoubleParam_TimeStep), (optimized_dyn_plan.dynamics_states[i].zmp[0] - optimized_dyn_plan.dynamics_states[i-1].zmp[0]) / self.planner_setting.get(PlannerDoubleParam_TimeStep),  optimized_dyn_plan.dynamics_states[i].amomd[1],  (optimized_dyn_plan.dynamics_states[i].zmp[1] - optimized_dyn_plan.dynamics_states[i-1].zmp[1]) / self.planner_setting.get(PlannerDoubleParam_TimeStep), optimized_dyn_plan.dynamics_states[i].amomd[0]])
+            u_stack = u_stack.reshape(1,22)
+            u_pos[i] = u_stack
+
+        self.crocs_data['Right']['x_inputs'].append(copy(init_pos))
+        self.crocs_data['Right']['x_state'].append(copy(x_pos))
+        self.crocs_data['Right']['u_trajs'].append(copy(u_pos))
+        with open('data.pickle', 'wb') as f:
+            pickle.dump(self.crocs_data, f, pickle.HIGHEST_PROTOCOL)
+        np.savetxt("hat.dat", x_pos)
+        
         time_vector = create_time_vector(dyn_optimizer.dynamicsSequence())
-        self.with_lqr = True
+        self.with_lqr = False
         if self.with_lqr:
             self.optimize_dynamics_feedback()
         return optimized_kin_plan, kin_optimizer.motion_eff, \

@@ -363,7 +363,7 @@ class BipedTocabiWrapper(BasicRobotWrapper):
 
 #        self.q = pinocchio.neutral(self.robot.model)
         initial_configuration = np.array(
-            [0.0, 0.0, 0.7457, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, -0.606, 1.572, -0.92, 0.0, 0.0, 0.0, -0.606, 1.572, -0.92, 0.0]
+            [0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
         )        
         self.q = initial_configuration
 

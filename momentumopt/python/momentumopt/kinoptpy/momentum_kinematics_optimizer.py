@@ -20,7 +20,7 @@ from pymomentum import *
 
 from momentumopt.robots.blmc_robot_wrapper import QuadrupedWrapper
 from momentumopt.kinoptpy.min_jerk_traj import *
-
+import math
 from pymomentum import \
     PlannerVectorParam_KinematicDefaultJointPositions, \
     PlannerIntParam_NumTimesteps, \
@@ -61,6 +61,91 @@ class EndeffectorTrajectoryGenerator(object):
                     count += 1
         return contact_plan
 
+    def quinticSpline(self, time, time_0, time_f, x_0, x_dot_0, x_ddot_0, x_f, x_dot_f, x_ddot_f):
+        time_s = time_f - time_0
+        a1 = x_0
+        a2 = x_dot_0
+        a3 = x_ddot_0 / 2.0
+
+        Temp = np.zeros((3,3))
+        R_temp = np.zeros(3)
+
+        Temp[0,0] = math.pow(time_s, 3)
+        Temp[0,1] = math.pow(time_s, 4)
+        Temp[0,2] = math.pow(time_s, 5)
+        Temp[1,0] = 3.0 * math.pow(time_s, 2)
+        Temp[1,1] = 4.0 * math.pow(time_s, 3)
+        Temp[1,2] = 5.0 * math.pow(time_s, 4)
+        Temp[2,0] = 6.0 * time_s
+        Temp[2,1] = 12.0 * math.pow(time_s, 2)
+        Temp[2,2] = 20.0 * math.pow(time_s, 3)
+
+        R_temp[0] = x_f - x_0 - x_dot_0 * time_s - x_ddot_0 * math.pow(time_s, 2) / 2.0
+        R_temp[1] = x_dot_f - x_dot_0 - x_ddot_0 * time_s
+        R_temp[2] = x_ddot_f - x_ddot_0
+
+        RES = np.matmul(np.linalg.inv(Temp), R_temp)
+
+        a4 = RES[0]
+        a5 = RES[1]
+        a6 = RES[2]
+
+        time_fs = time - time_0
+
+        position = a1 + a2 * math.pow(time_fs, 1) + a3 * math.pow(time_fs, 2) + a4 * math.pow(time_fs, 3) + a5 * math.pow(time_fs, 4) + a6 * math.pow(time_fs, 5)
+        
+        result = position
+
+        if time < time_0:
+            result = x_0
+        elif time > time_f:
+            result = x_f
+
+        return result
+
+    def quinticSplineDot(self, time, time_0, time_f, x_0, x_dot_0, x_ddot_0, x_f, x_dot_f, x_ddot_f):
+        time_s = time_f - time_0
+        a1 = x_0
+        a2 = x_dot_0
+        a3 = x_ddot_0 / 2.0
+
+        Temp = np.zeros((3,3))
+        R_temp = np.zeros(3)
+
+        Temp[0,0] = math.pow(time_s, 3)
+        Temp[0,1] = math.pow(time_s, 4)
+        Temp[0,2] = math.pow(time_s, 5)
+        Temp[1,0] = 3.0 * math.pow(time_s, 2)
+        Temp[1,1] = 4.0 * math.pow(time_s, 3)
+        Temp[1,2] = 5.0 * math.pow(time_s, 4)
+        Temp[2,0] = 6.0 * time_s
+        Temp[2,1] = 12.0 * math.pow(time_s, 2)
+        Temp[2,2] = 20.0 * math.pow(time_s, 3)
+
+        R_temp[0] = x_f - x_0 - x_dot_0 * time_s - x_ddot_0 * math.pow(time_s, 2) / 2.0
+        R_temp[1] = x_dot_f - x_dot_0 - x_ddot_0 * time_s
+        R_temp[2] = x_ddot_f - x_ddot_0
+
+        RES = np.matmul(np.linalg.inv(Temp), R_temp)
+
+        a4 = RES[0]
+        a5 = RES[1]
+        a6 = RES[2]
+
+        time_fs = time - time_0
+
+        position = a1 + a2 * math.pow(time_fs, 1) + a3 * math.pow(time_fs, 2) + a4 * math.pow(time_fs, 3) + a5 * math.pow(time_fs, 4) + a6 * math.pow(time_fs, 5)
+        velocity = a2 + 2.0 * a3 * math.pow(time_fs, 1) + 3.0 * a4 * math.pow(time_fs, 2) + 4.0 * a5 * math.pow(time_fs, 3) + 5.0 * a6 * math.pow(time_fs, 4);
+        
+        result = velocity
+
+        if time < time_0:
+            result = x_dot_0
+        elif time > time_f:
+            result = x_dot_f
+
+        return result
+
 
     def generate_eff_traj(self, mom_kin_optimizer, contact_plan):
         eff_traj_poly = {}
@@ -82,12 +167,37 @@ class EndeffectorTrajectoryGenerator(object):
                         if idx == 2:
                             via = self.z_offset + contact_plan[eff][i][2][idx]
                         poly = poly_points(t, contact_plan[eff][i][2][idx], contact_plan[eff][i+1][2][idx], via)
-                        poly_traj[idx].append(t, poly)
+                        poly_traj[idx].append(t,poly)
 
             eff_traj_poly[eff] = poly_traj
-
         # returns end eff trajectories
         return eff_traj_poly
+
+    def generate_eff_traj1(self, mom_kin_optimizer, contact_plan):
+        eff_traj_poly = {}
+        for eff in mom_kin_optimizer.eff_names:
+            num_contacts = len(contact_plan[eff])
+            poly_traj = [PolynominalList(), PolynominalList(), PolynominalList()]
+            for i in range(num_contacts):
+                # Create a constant polynominal for endeffector on the ground.
+                t = [contact_plan[eff][i][0], contact_plan[eff][i][1]]
+                for idx in range(3):
+                    poly_traj[idx].append(t, constant_poly(contact_plan[eff][i][2][idx]))
+                
+                # If there is a contact following, add the transition between
+                # the two contact points.
+                if i < num_contacts - 1:
+                    t = [contact_plan[eff][i][1], contact_plan[eff][i+1][0]]
+                    for idx in range(3):
+                        via = None
+                        if idx == 2:
+                            via = self.z_offset + contact_plan[eff][i][2][idx]
+                
+                    if eff == 'RF_contact':
+                        poly = np.array(poly_points1(t, contact_plan[eff][i][2][0], contact_plan[eff][i+1][2][0], contact_plan[eff][i][2][1], contact_plan[eff][i+1][2][1], contact_plan[eff][i][2][2], contact_plan[eff][i+1][2][2], via))
+                    else:
+                        poly1 = np.array(poly_points1(t, contact_plan[eff][i][2][0], contact_plan[eff][i+1][2][0], contact_plan[eff][i][2][1], contact_plan[eff][i+1][2][1], contact_plan[eff][i][2][2], contact_plan[eff][i+1][2][2], via))
+        return poly, poly1
 
 
     def __call__(self, mom_kin_optimizer):
@@ -100,28 +210,67 @@ class EndeffectorTrajectoryGenerator(object):
         '''
         dt = mom_kin_optimizer.dt
         num_eff = len(mom_kin_optimizer.eff_names)
-        #print("num_eff")
-        #print(mom_kin_optimizer.eff_names[0])
-        #print(mom_kin_optimizer.eff_names[1])
         
         num_time_steps = mom_kin_optimizer.num_time_steps
-
         contact_plan = self.get_contact_plan_from_dyn_optimizer(mom_kin_optimizer)
 
         # Generate minimum jerk trajectories
-        eff_traj_poly = self.generate_eff_traj(mom_kin_optimizer, contact_plan)
+        eff_traj_poly, eff_traj_poly1 = self.generate_eff_traj1(mom_kin_optimizer, contact_plan)
 
         # Compute the endeffector position and velocity trajectories.
         endeff_pos_ref = np.zeros((num_time_steps, num_eff, 3))
         endeff_vel_ref = np.zeros((num_time_steps, num_eff, 3))
         endeff_contact = np.zeros((num_time_steps, num_eff))
+        
+        num_step = 0
+        num_step1 = 0
 
         for it in range(num_time_steps):
             for eff, name in enumerate(mom_kin_optimizer.eff_names):
-                endeff_pos_ref[it][eff] = [eff_traj_poly[name][i].eval(it) for i in range(3)]
-                endeff_vel_ref[it][eff] = [eff_traj_poly[name][i].deval(it)/dt for i in range(3)]
-                endeff_contact[it][eff] = self.is_end_eff_in_contact(it, eff, mom_kin_optimizer)
+                #endeff_pos_ref[it][eff] = [eff_traj_poly[name][i].eval(it) for i in range(3)]
+                #endeff_vel_ref[it][eff] = [eff_traj_poly[name][i].deval(it)/dt for i in range(3)]
+                if it != 0:
+                    if(it >= eff_traj_poly[6*num_step, 0] and it <= eff_traj_poly[6*num_step + 5, 0]) or 6*(num_step + 1) >= eff_traj_poly.shape[0]:
+                        num_step = num_step
+                    else:
+                        num_step = num_step + 1
 
+                if it != 0:
+                    if(it >= eff_traj_poly[6*num_step1, 0] and it <= eff_traj_poly[6*num_step1 + 5, 0]) or 6*(num_step1 + 1) >= eff_traj_poly.shape[0]:
+                        num_step1 = num_step1
+                    else:
+                        num_step1 = num_step1 + 1
+
+                endeff_contact[it][eff] = self.is_end_eff_in_contact(it, eff, mom_kin_optimizer)
+                if eff == 0:
+                    x = self.quinticSpline(it, int(eff_traj_poly[6* num_step, 0]), int(eff_traj_poly[6*num_step + 5, 0]), eff_traj_poly[6* num_step, 1], eff_traj_poly[6*num_step + 1, 1], eff_traj_poly[6* num_step + 2, 1], eff_traj_poly[6*num_step + 3, 1], eff_traj_poly[6* num_step + 4, 1], eff_traj_poly[6*num_step + 5, 1])
+                    xv = self.quinticSplineDot(it, int(eff_traj_poly[6* num_step, 0]), int(eff_traj_poly[6*num_step + 5, 0]), eff_traj_poly[6* num_step, 1], eff_traj_poly[6*num_step + 1, 1], eff_traj_poly[6* num_step + 2, 1], eff_traj_poly[6*num_step + 3, 1], eff_traj_poly[6* num_step + 4, 1], eff_traj_poly[6*num_step + 5, 1])
+                    y = self.quinticSpline(it, int(eff_traj_poly[6* num_step, 0]), int(eff_traj_poly[6*num_step + 5, 0]), eff_traj_poly[6* num_step, 2], eff_traj_poly[6*num_step + 1, 2], eff_traj_poly[6* num_step + 2, 2], eff_traj_poly[6*num_step + 3, 2], eff_traj_poly[6* num_step + 4, 2], eff_traj_poly[6*num_step + 5, 2])
+                    yv = self.quinticSplineDot(it, int(eff_traj_poly[6* num_step, 0]), int(eff_traj_poly[6*num_step + 5, 0]), eff_traj_poly[6* num_step, 2], eff_traj_poly[6*num_step + 1, 2], eff_traj_poly[6* num_step + 2, 2], eff_traj_poly[6*num_step + 3, 2], eff_traj_poly[6* num_step + 4, 2], eff_traj_poly[6*num_step + 5, 2])
+                    
+                    if (it <= (int(eff_traj_poly[6* num_step, 0]) + int(eff_traj_poly[6*num_step + 5, 0]))/2):
+                        z = self.quinticSpline(it, int(eff_traj_poly[6* num_step, 0]), (int(eff_traj_poly[6* num_step, 0]) + int(eff_traj_poly[6*num_step + 5, 0]))/2, eff_traj_poly[6* num_step, 3], eff_traj_poly[6*num_step + 1, 3], eff_traj_poly[6* num_step + 2, 3], eff_traj_poly[6*num_step + 3, 3] + 0.03, eff_traj_poly[6* num_step + 4, 3], eff_traj_poly[6*num_step + 5, 3])
+                        zv = self.quinticSplineDot(it, int(eff_traj_poly[6* num_step, 0]), (int(eff_traj_poly[6* num_step, 0]) + int(eff_traj_poly[6*num_step + 5, 0]))/2, eff_traj_poly[6* num_step, 3], eff_traj_poly[6*num_step + 1, 3], eff_traj_poly[6* num_step + 2, 3], eff_traj_poly[6*num_step + 3, 3] + 0.03, eff_traj_poly[6* num_step + 4, 3], eff_traj_poly[6*num_step + 5, 3])
+                    else:
+                        z = self.quinticSpline(it, (int(eff_traj_poly[6* num_step, 0]) + int(eff_traj_poly[6*num_step + 5, 0]))/2+ 1, int(eff_traj_poly[6*num_step + 5, 0]), eff_traj_poly[6* num_step, 3] + 0.03, eff_traj_poly[6*num_step + 1, 3], eff_traj_poly[6* num_step + 2, 3], eff_traj_poly[6*num_step + 3, 3], eff_traj_poly[6* num_step + 4, 3], eff_traj_poly[6*num_step + 5, 3])
+                        zv = self.quinticSplineDot(it, (int(eff_traj_poly[6* num_step, 0]) + int(eff_traj_poly[6*num_step + 5, 0]))/2+ 1, int(eff_traj_poly[6*num_step + 5, 0]), eff_traj_poly[6* num_step, 3] + 0.03, eff_traj_poly[6*num_step + 1, 3], eff_traj_poly[6* num_step + 2, 3] , eff_traj_poly[6*num_step + 3, 3], eff_traj_poly[6* num_step + 4, 3], eff_traj_poly[6*num_step + 5, 3])
+
+                    endeff_pos_ref[it][eff] = np.array([x, y, z])
+                    endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
+                else:
+                    x = self.quinticSpline(it, int(eff_traj_poly1[6* num_step1, 0]), int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 1], eff_traj_poly1[6*num_step1 + 1, 1], eff_traj_poly1[6* num_step1 + 2, 1], eff_traj_poly1[6*num_step1 + 3, 1], eff_traj_poly1[6* num_step1 + 4, 1], eff_traj_poly1[6*num_step1 + 5, 1])
+                    xv = self.quinticSplineDot(it, int(eff_traj_poly1[6* num_step1, 0]), int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 1], eff_traj_poly1[6*num_step1 + 1, 1], eff_traj_poly1[6* num_step1 + 2, 1], eff_traj_poly1[6*num_step1 + 3, 1], eff_traj_poly1[6* num_step1 + 4, 1], eff_traj_poly1[6*num_step1 + 5, 1])
+                    y = self.quinticSpline(it, int(eff_traj_poly1[6* num_step1, 0]), int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 2], eff_traj_poly1[6*num_step1 + 1, 2], eff_traj_poly1[6* num_step1 + 2, 2], eff_traj_poly1[6*num_step1 + 3, 2], eff_traj_poly1[6* num_step1 + 4, 2], eff_traj_poly1[6*num_step1 + 5, 2])
+                    yv = self.quinticSplineDot(it, int(eff_traj_poly1[6* num_step1, 0]), int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 2], eff_traj_poly1[6*num_step1 + 1, 2], eff_traj_poly1[6* num_step1 + 2, 2], eff_traj_poly1[6*num_step1 + 3, 2], eff_traj_poly1[6* num_step1 + 4, 2], eff_traj_poly1[6*num_step1 + 5, 2])
+                    if (it <= (int(eff_traj_poly1[6* num_step1, 0]) + int(eff_traj_poly1[6*num_step1 + 5, 0]))/2):
+                        z = self.quinticSpline(it, int(eff_traj_poly1[6* num_step1, 0]), (int(eff_traj_poly1[6* num_step1, 0]) + int(eff_traj_poly1[6*num_step1 + 5, 0]))/2, eff_traj_poly1[6* num_step1, 3], eff_traj_poly1[6*num_step1 + 1, 3], eff_traj_poly1[6* num_step1 + 2, 3], eff_traj_poly1[6*num_step1 + 3, 3] + 0.03, eff_traj_poly1[6* num_step1 + 4, 3], eff_traj_poly1[6*num_step1 + 5, 3])
+                        zv = self.quinticSplineDot(it, int(eff_traj_poly1[6* num_step1, 0]), (int(eff_traj_poly1[6* num_step1, 0]) + int(eff_traj_poly1[6*num_step1 + 5, 0]))/2, eff_traj_poly1[6* num_step1, 3], eff_traj_poly1[6*num_step1 + 1, 3], eff_traj_poly1[6* num_step1 + 2, 3], eff_traj_poly1[6*num_step1 + 3, 3] + 0.03, eff_traj_poly1[6* num_step1 + 4, 3], eff_traj_poly1[6*num_step1 + 5, 3])
+                    else:
+                        z = self.quinticSpline(it, (int(eff_traj_poly1[6* num_step1, 0]) + int(eff_traj_poly1[6*num_step1 + 5, 0]))/2 + 1, int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 3] + 0.03, eff_traj_poly1[6*num_step1 + 1, 3], eff_traj_poly1[6* num_step1 + 2, 3], eff_traj_poly1[6*num_step1 + 3, 3], eff_traj_poly1[6* num_step1 + 4, 3], eff_traj_poly1[6*num_step1 + 5, 3])
+                        zv = self.quinticSplineDot(it, (int(eff_traj_poly1[6* num_step1, 0]) + int(eff_traj_poly1[6*num_step1 + 5, 0]))/2 + 1, int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 3] + 0.03, eff_traj_poly1[6*num_step1 + 1, 3], eff_traj_poly1[6* num_step1 + 2, 3], eff_traj_poly1[6*num_step1 + 3, 3], eff_traj_poly1[6* num_step1 + 4, 3], eff_traj_poly1[6*num_step1 + 5, 3])
+                    
+                    endeff_pos_ref[it][eff] = np.array([x, y, z])
+                    endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 
 
@@ -211,6 +360,8 @@ class MomentumKinematicsOptimizer(object):
         self.hip_ids = [self.robot.model.getFrameId(name) for name in self.hip_names]
         #otherrobot = self.robot.effs#
         self.eff_names = self.robot.effs#= ['{}_{}'.format(eff, self.robot.joints_list[-1]) for eff in self.robot.effs]
+        self.q_init = self.robot.q
+        self.dq_init = self.robot.dq
         self.inv_kin = PointContactInverseKinematics(self.robot.model, self.eff_names)
         self.snd_order_inv_kin = SecondOrderInverseKinematics(self.robot.model, self.eff_names)
         self.use_second_order_inv_kin = False
@@ -228,8 +379,6 @@ class MomentumKinematicsOptimizer(object):
           self.com_dyn[it] = self.dynamic_sequence.dynamics_states[it].com
           self.lmom_dyn[it] = self.dynamic_sequence.dynamics_states[it].lmom
           self.amom_dyn[it] = self.dynamic_sequence.dynamics_states[it].amom
-        #print("com1")
-        #print(self.com_dyn)  
 
     def fill_endeffector_trajectory(self):
         self.endeff_pos_ref, self.endeff_vel_ref, self.endeff_contact = \
@@ -284,7 +433,7 @@ class MomentumKinematicsOptimizer(object):
     def optimize_initial_position(self, init_state):
         # Optimize the initial configuration
         q = se3.neutral(self.robot.model)
-
+        
         plan_joint_init_pos = self.planner_setting.get(
             PlannerVectorParam_KinematicDefaultJointPositions)
         if len(plan_joint_init_pos) != self.robot.num_ctrl_joints:
@@ -304,7 +453,9 @@ class MomentumKinematicsOptimizer(object):
         endeff_pos_ref = np.array([init_state.effPosition(i) for i in range(num_eff)])
         endeff_vel_ref = np.matrix(np.zeros((num_eff, 3)))
         endeff_contact = np.ones(num_eff)
+
         quad_goal = se3.Quaternion(se3.rpy.rpyToMatrix(np.zeros([3,])))
+ 
         q[3:7] = quad_goal.coeffs()
         self.max_iterations = 100
 
@@ -312,7 +463,6 @@ class MomentumKinematicsOptimizer(object):
             # Adding small P controller for the base orientation to always start with flat
             # oriented base.
             quad_q = se3.Quaternion(float(q[6]), float(q[3]), float(q[4]), float(q[5]))
-
             amom_ref = 1e-1 * se3.log((quad_goal * quad_q.inverse()).matrix())
             res = self.inv_kin.compute(q, dq, com_ref, lmom_ref, amom_ref,
                                       endeff_pos_ref, endeff_vel_ref, endeff_contact, None)
@@ -335,13 +485,13 @@ class MomentumKinematicsOptimizer(object):
 
         # Create array with centroidal and endeffector informations.
         self.fill_data_from_dynamics()
-
+        
         self.fill_endeffector_trajectory()
 
         # Run the optimization for the initial configuration only once.
         if self.q_init is None:
             self.optimize_initial_position(init_state)
-
+        
         # Generate smooth joint trajectory for regularization
         self.joint_des = np.zeros((len(self.q_init[7:]),self.num_time_steps), float)
         if self.n_via_joint == 0:
@@ -374,37 +524,34 @@ class MomentumKinematicsOptimizer(object):
         # Compute inverse kinematics over the full trajectory.
         self.inv_kin.is_init_time = 0
         q, dq = self.q_init.copy(), self.dq_init.copy()
-
+        
         if self.use_second_order_inv_kin:
-            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, rf_ori_kin, lf_ori_kin= \
+
+            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin= \
                 self.snd_order_inv_kin.solve(self.dt, q, dq, self.com_dyn, self.lmom_dyn,
                     self.amom_dyn, self.endeff_pos_ref, self.endeff_vel_ref,
                     self.endeff_contact, self.joint_des.T, self.base_des.T)
-
-            self.rf_ori_kin = rf_ori_kin
-            self.lf_ori_kin = lf_ori_kin
-
             for it, (q, dq) in enumerate(zip(q_kin, dq_kin)):
                 self.inv_kin.forward_robot(q, dq)
-                self.fill_kinematic_result(it, q, dq)                
-                if it <= 1:
-                    print("end-posref")
-                    print(it)
-                    print(self.q_kin[it])
-                    print("End-real")
-                    print(self.dq_kin[it])
-                    #print("com_kin")
-                    #print(self.com_kin[it]) 
-                    #print("base_kin")
-                    #print(self.q_kin[it][0:7]) 
-                    #print("eff_kin")
-                    #print(self.q_kin[it][0:7]) 
-                    #print("Eff_con")
-                    #print(self.endeff_contact[it])
-                    #print("rf_ori_kin")
-                    #print(self.rf_ori_kin[it])
-                    #print("lf_ori_kin")
-                    #print(self.lf_ori_kin[it])
+                self.fill_kinematic_result(it, q, dq) 
+        
+                #print(self.q_kin[it])
+                #print("dq")
+                #print(self.dq_kin[it])
+                print("com_kin")
+                print(com_kin[it]) 
+                #print("base_kin")
+                #print(self.q_kin[it][0:7]) 
+                #print("eff_kin")
+                #print(self.q_kin[it][0:7]) 
+                print("Eff_con1")
+                print(self.endeff_pos_ref[it])
+                print("Eff_con")
+                print(endeff_pos_kin[it])
+                #print("rf_ori_kin")
+                #print(self.rf_ori_kin[it])
+                #print("lf_ori_kin")
+                #print(self.lf_ori_kin[it])
                 
         else:
             for it in range(self.num_time_steps):
