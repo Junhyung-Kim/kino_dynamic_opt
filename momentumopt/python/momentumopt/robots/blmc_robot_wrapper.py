@@ -142,6 +142,7 @@ class BasicRobotWrapper(object):
 
     def initDisplay(self, loadModel=True):
         self.robot.initViewer(loadModel=loadModel)
+        #self.viz.initViewer(True)
         self.robot.viewer.gui.addFloor('world/floor')
         self.robot.viewer.gui.applyConfiguration('world/floor', [
             0.0, 0.0, self.floor_height,  0.0, 0.0, 0.0, 1.0])

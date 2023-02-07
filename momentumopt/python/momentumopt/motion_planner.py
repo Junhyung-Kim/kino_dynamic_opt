@@ -377,8 +377,8 @@ class MotionPlanner():
     def optimize_motion(self, plot_com_motion=True):
         dyn_optimizer = self.dyn_optimizer
         kin_optimizer = self.kin_optimizer
+
         self.optimize_dynamics(0)
-        #
         bool_iter = True
         kd_iter = 0
         for kd_iter in range(0, self.planner_setting.get(PlannerIntParam_KinDynIterations)):
@@ -386,27 +386,9 @@ class MotionPlanner():
             self.optimize_dynamics(kd_iter + 1)
             optimized_kin_plan = self.kin_optimizer.kinematics_sequence
             optimized_dyn_plan = self.dyn_optimizer.dynamicsSequence()
-            '''
-            for i in range(0, self.planner_setting.get(PlannerIntParam_NumTimesteps)):
-                if(abs(optimized_dyn_plan.dynamics_states[i].com[2] - optimized_kin_plan.kinematics_states[i].com[2]) < 0.01):
-                    bool_iter = False
-                else:
-                    print("ccc")
-                    print(i)
-                    print(abs(optimized_dyn_plan.dynamics_states[i].com[2] - optimized_kin_plan.kinematics_states[i].com[2]) )
-                
-                    bool_iter = False
-                    break
-            '''
-            #if kd_iter == 0:
-            #    bool_iter = False
+            
             kd_iter = kd_iter + 1
-            #if plot_com_motion:
-            #    self.plot_com_motion(optimized_dyn_plan.dynamics_states,
-            #           optimized_kin_plan.kinematics_states, plot_show=True,
-            #            fig_suptitle='kd_iter={}'.format(kd_iter))
         
-        #self.save_files1(0)
         optimized_kin_plan = kin_optimizer.kinematics_sequence
         optimized_dyn_plan = dyn_optimizer.dynamicsSequence()
 
