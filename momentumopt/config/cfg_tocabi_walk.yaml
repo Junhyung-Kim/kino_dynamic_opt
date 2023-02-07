@@ -231,9 +231,9 @@ planner_variables:
   w_lmom: [0.1, 0.1, 0.1]
   w_amomd: [0.300, 0.342, 0.100]
   w_lmomd: [8.0, 0.1, 5.0]
-  w_zmp: [5, 5]
-  w_zmpd: [3000,5000]
-  w_zmpc: [290000, 300000]
+  w_zmp: [1, 5]
+  w_zmpd: [5000,5000]
+  w_zmpc: [450000, 300000]
   
   w_amom_final: [10.00, 10.0, 10.00] # cost weight of final linear momentum
   w_lmom_final: [10.00, 10.0, 10.00] # cost weight of final angular momentum
