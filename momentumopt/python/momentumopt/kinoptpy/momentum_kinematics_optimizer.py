@@ -527,7 +527,7 @@ class MomentumKinematicsOptimizer(object):
         
         if self.use_second_order_inv_kin:
 
-            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin= \
+            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, self.rf_ori_kin, self.lf_ori_kin= \
                 self.snd_order_inv_kin.solve(self.dt, q, dq, self.com_dyn, self.lmom_dyn,
                     self.amom_dyn, self.endeff_pos_ref, self.endeff_vel_ref,
                     self.endeff_contact, self.joint_des.T, self.base_des.T)
@@ -540,18 +540,18 @@ class MomentumKinematicsOptimizer(object):
                 #print(self.dq_kin[it])
                 print("com_kin")
                 print(com_kin[it]) 
-                #print("base_kin")
-                #print(self.q_kin[it][0:7]) 
+                print("base_kin")
+                print(self.q_kin[it][0:7]) 
                 #print("eff_kin")
                 #print(self.q_kin[it][0:7]) 
                 print("Eff_con1")
                 print(self.endeff_pos_ref[it])
                 print("Eff_con")
                 print(endeff_pos_kin[it])
-                #print("rf_ori_kin")
-                #print(self.rf_ori_kin[it])
-                #print("lf_ori_kin")
-                #print(self.lf_ori_kin[it])
+                print("rf_ori_kin")
+                print(self.rf_ori_kin[it])
+                print("lf_ori_kin")
+                print(self.lf_ori_kin[it])
                 
         else:
             for it in range(self.num_time_steps):

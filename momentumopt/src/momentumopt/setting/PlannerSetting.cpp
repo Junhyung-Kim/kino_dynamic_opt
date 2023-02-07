@@ -107,6 +107,8 @@ namespace momentumopt {
       YAML::ReadParameter(planner_vars, "w_amomd", w_amomd_);
       YAML::ReadParameter(planner_vars, "w_lmomd", w_lmomd_);
       YAML::ReadParameter(planner_vars, "w_zmp", w_zmp_);
+      YAML::ReadParameter(planner_vars, "w_zmpd", w_zmpd_);
+      YAML::ReadParameter(planner_vars, "w_zmpc", w_zmpc_);
       YAML::ReadParameter(planner_vars, "w_com_via", w_com_via_);
       YAML::ReadParameter(planner_vars, "w_trq_arm", w_trq_arm_);
       YAML::ReadParameter(planner_vars, "w_trq_leg", w_trq_leg_);
@@ -154,12 +156,16 @@ namespace momentumopt {
           YAML::ReadParameter(planner_vars, "w_ang_mom_tracking_second", w_ang_mom_tracking_second_);
           YAML::ReadParameter(planner_vars, "w_endeff_contact_second", w_endeff_contact_second_);
           YAML::ReadParameter(planner_vars, "w_endeff_tracking_second", w_endeff_tracking_second_);
+          YAML::ReadParameter(planner_vars, "w_endori_contact_second", w_endori_contact_second_);
+          YAML::ReadParameter(planner_vars, "w_endori_tracking_second", w_endori_tracking_second_);
           YAML::ReadParameter(planner_vars, "p_endeff_tracking_second", p_endeff_tracking_second_);
           YAML::ReadParameter(planner_vars, "p_com_tracking_second", p_com_tracking_second_);
           YAML::ReadParameter(planner_vars, "w_joint_regularization_second", w_joint_regularization_second_);
           YAML::ReadParameter(planner_vars, "d_endeff_tracking_second", d_endeff_tracking_second_);
           YAML::ReadParameter(planner_vars, "p_orient_tracking_second", p_orient_tracking_second_);
           YAML::ReadParameter(planner_vars, "d_orient_tracking_second", d_orient_tracking_second_);
+          YAML::ReadParameter(planner_vars, "p_orientf_tracking_second", p_orientf_tracking_second_);
+          YAML::ReadParameter(planner_vars, "d_orientf_tracking_second", d_orientf_tracking_second_);
           YAML::ReadParameter(planner_vars, "p_joint_regularization_second", p_joint_regularization_second_);
           YAML::ReadParameter(planner_vars, "d_joint_regularization_second", d_joint_regularization_second_);
           YAML::ReadParameter(planner_vars, "p_mom_tracking_second", p_mom_tracking_second_);
@@ -344,12 +350,16 @@ namespace momentumopt {
       case PlannerDoubleParam_WeightAngMomentumTracking_Second : { return w_ang_mom_tracking_second_; }
       case PlannerDoubleParam_WeightEndEffContact_Second : { return w_endeff_contact_second_; }
       case PlannerDoubleParam_WeightEndEffTracking_Second : { return w_endeff_tracking_second_; }
+      case PlannerDoubleParam_WeightEndOriContact_Second : { return w_endori_contact_second_; }
+      case PlannerDoubleParam_WeightEndOriTracking_Second : { return w_endori_tracking_second_; }
       case PlannerDoubleParam_PGainEndEffTracking_Second : { return p_endeff_tracking_second_; }
       case PlannerDoubleParam_PGainComTracking_Second : { return p_com_tracking_second_; }
       case PlannerDoubleParam_WeightJointReg_Second : { return w_joint_regularization_second_; }
       case PlannerDoubleParam_DGainEndEffTracking_Second : { return d_endeff_tracking_second_; }
       case PlannerDoubleParam_PGainBaseOrientationTracking_Second : { return p_orient_tracking_second_; }
       case PlannerDoubleParam_DGainBaseOrientationTracking_Second : { return d_orient_tracking_second_; }
+      case PlannerDoubleParam_PGainFOrientationTracking_Second : { return p_orientf_tracking_second_; }
+      case PlannerDoubleParam_DGainFOrientationTracking_Second : { return d_orientf_tracking_second_; }
       case PlannerDoubleParam_PGainJointRegularization_Second : { return p_joint_regularization_second_; }
       case PlannerDoubleParam_DGainJointRegularization_Second : { return d_joint_regularization_second_; }
       // Not handled parameters
@@ -416,6 +426,8 @@ namespace momentumopt {
       case PlannerVectorParam_WeightLegForceRate : { return w_dfrc_leg_; }
       case PlannerVectorParam_WeightLinearMomentumRate : { return w_lmomd_; }
       case PlannerVectorParam_WeightZMP : { return w_zmp_; }
+      case PlannerVectorParam_WeightdZMP : { return w_zmpd_; }
+      case PlannerVectorParam_WeightZMPC : { return w_zmpc_; }
       case PlannerVectorParam_WeightAngularMomentumRate : { return w_amomd_; }
       case PlannerVectorParam_WeightCenterOfMassViapoint : { return w_com_via_; }
       case PlannerVectorParam_WeightFinalLinearMomentum : { return w_lmom_final_; }
@@ -585,6 +597,8 @@ namespace momentumopt {
       case PlannerDoubleParam_WeightAngMomentumTracking_Second : { return w_ang_mom_tracking_second_; }
       case PlannerDoubleParam_WeightEndEffContact_Second : { return w_endeff_contact_second_; }
       case PlannerDoubleParam_WeightEndEffTracking_Second : { return w_endeff_tracking_second_; }
+      case PlannerDoubleParam_WeightEndOriContact_Second : { return w_endori_contact_second_; }
+      case PlannerDoubleParam_WeightEndOriTracking_Second : { return w_endori_tracking_second_; }
       case PlannerDoubleParam_PGainEndEffTracking_Second : { return p_endeff_tracking_second_; }
       case PlannerDoubleParam_PGainComTracking_Second : { return p_com_tracking_second_; }
 
@@ -652,6 +666,8 @@ namespace momentumopt {
       case PlannerVectorParam_WeightLegForceRate : { return w_dfrc_leg_; }
       case PlannerVectorParam_WeightLinearMomentumRate : { return w_lmomd_; }
       case PlannerVectorParam_WeightZMP : { return w_zmp_; }
+      case PlannerVectorParam_WeightdZMP : { return w_zmpd_; }
+      case PlannerVectorParam_WeightZMPC : { return w_zmpc_; }
       case PlannerVectorParam_WeightAngularMomentumRate : { return w_amomd_; }
       case PlannerVectorParam_WeightCenterOfMassViapoint : { return w_com_via_; }
       case PlannerVectorParam_WeightFinalLinearMomentum : { return w_lmom_final_; }

@@ -312,9 +312,9 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         self.effs = ["RF_contact", "LF_contact"]
         # self.colors = {"L": "r", "R": "y"}
         self.joints_list = ["R_HipYaw_Joint", "R_HipRoll_Joint", "R_HipPitch_Joint", "R_Knee_Joint", "R_AnklePitch_Joint", "R_AnkleRoll_Joint", "L_HipYaw_Joint", "L_HipRoll_Joint", "L_HipPitch_Joint", "L_Knee_Joint", "L_AnklePitch_Joint", "L_AnkleRoll_Joint"]
-        self.floor_height = 0.
-        self.robot = TocabiConfig.buildRobotWrapper()
+        self.floor_height = 0.0
 
+        self.robot = TocabiConfig.buildRobotWrapper()
         self.num_ctrl_joints = 12
 
         # Create data again after setting frames

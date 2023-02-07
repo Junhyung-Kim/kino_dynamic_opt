@@ -72,12 +72,12 @@ namespace momentumopt {
              lambda_regularization_, swing_traj_via_z_, w_lin_mom_tracking_, w_ang_mom_tracking_, w_endeff_contact_,
              w_endeff_tracking_, p_endeff_tracking_, p_com_tracking_, w_joint_regularization_, reg_orientation_,
              reg_joint_position_, swing_traj_via_z_second_ ,w_lin_mom_tracking_second_ ,w_ang_mom_tracking_second_,
-             w_endeff_contact_second_, w_endeff_tracking_second_, p_endeff_tracking_second_, p_com_tracking_second_,
-             w_joint_regularization_second_, d_endeff_tracking_second_, p_orient_tracking_second_,
+             w_endeff_contact_second_, w_endeff_tracking_second_, w_endori_contact_second_, w_endori_tracking_second_, p_endeff_tracking_second_, p_com_tracking_second_,
+             w_joint_regularization_second_, d_endeff_tracking_second_, p_orient_tracking_second_, p_orientf_tracking_second_, d_orientf_tracking_second_,
              d_orient_tracking_second_, p_joint_regularization_second_, d_joint_regularization_second_;
 
       /*! helper vector variables for the optimization problem */
-      Eigen::Vector2d time_range_, torque_range_, w_zmp_;
+      Eigen::Vector2d time_range_, torque_range_, w_zmp_,w_zmpd_, w_zmpc_;
       Eigen::Vector3d external_force_, com_displacement_;
       Eigen::Vector3d w_com_, w_lmom_, w_lmomd_, w_lmom_final_, w_amom_, w_amomd_, w_amom_final_,
 	                  w_com_via_, w_frc_arm_, w_frc_leg_, w_dfrc_arm_, w_dfrc_leg_, gravity_vector_,

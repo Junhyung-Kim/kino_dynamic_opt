@@ -121,7 +121,7 @@ namespace momentumopt {
 
     private:
 	  double dtime_;
-    Eigen::Vector2d ZMP_;
+    Eigen::Vector2d ZMP_, ZMPd_;
 	  Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_;
       std::array<bool, Problem::n_endeffs_> eff_activations_;
       std::array<int, Problem::n_endeffs_> eff_ids_, cnt_ids_;

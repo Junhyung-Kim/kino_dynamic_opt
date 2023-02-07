@@ -107,6 +107,8 @@ class MotionPlanner():
             snd_order_inv_kin.w_ang_mom_tracking = self.planner_setting.get(PlannerDoubleParam_WeightAngMomentumTracking_Second)
             snd_order_inv_kin.w_endeff_contact = self.planner_setting.get(PlannerDoubleParam_WeightEndEffContact_Second)
             snd_order_inv_kin.w_endeff_tracking = self.planner_setting.get(PlannerDoubleParam_WeightEndEffTracking_Second)
+            snd_order_inv_kin.w_endori_contact = self.planner_setting.get(PlannerDoubleParam_WeightEndOriContact_Second)
+            snd_order_inv_kin.w_endori_tracking = self.planner_setting.get(PlannerDoubleParam_WeightEndOriTracking_Second)
             snd_order_inv_kin.w_joint_regularization = self.planner_setting.get(PlannerDoubleParam_WeightJointReg_Second)
             snd_order_inv_kin.p_endeff_tracking = self.planner_setting.get(PlannerDoubleParam_PGainEndEffTracking_Second)
             snd_order_inv_kin.p_com_tracking = self.planner_setting.get(PlannerDoubleParam_PGainComTracking_Second)
@@ -118,6 +120,8 @@ class MotionPlanner():
             snd_order_inv_kin.d_endeff_tracking = self.planner_setting.get(PlannerDoubleParam_DGainEndEffTracking_Second)
             snd_order_inv_kin.p_orient_tracking = self.planner_setting.get(PlannerDoubleParam_PGainBaseOrientationTracking_Second)
             snd_order_inv_kin.d_orient_tracking = self.planner_setting.get(PlannerDoubleParam_DGainBaseOrientationTracking_Second)
+            snd_order_inv_kin.p_orientf_tracking = self.planner_setting.get(PlannerDoubleParam_PGainFOrientationTracking_Second)
+            snd_order_inv_kin.d_orientf_tracking = self.planner_setting.get(PlannerDoubleParam_DGainFOrientationTracking_Second)
             snd_order_inv_kin.p_joint_regularization = self.planner_setting.get(PlannerDoubleParam_PGainJointRegularization_Second)
             snd_order_inv_kin.d_joint_regularization =self.planner_setting.get(PlannerDoubleParam_DGainJointRegularization_Second)
             snd_order_inv_kin.p_mom_tracking = self.planner_setting.get(PlannerVectorParam_PGainMomentumTracking_Second)
@@ -308,7 +312,7 @@ class MotionPlanner():
 
         def states_to_vec(states):
             com = np.vstack([s.com for s in states])
-            lmom = np.vstack([s.lmom for s in states])
+            lmom = np.vstack([s.lmom/95.941282 for s in states])
             amom = np.vstack([s.amom for s in states])
             return com, lmom, amom
 
@@ -402,7 +406,6 @@ class MotionPlanner():
             #           optimized_kin_plan.kinematics_states, plot_show=True,
             #            fig_suptitle='kd_iter={}'.format(kd_iter))
         
-        
         #self.save_files1(0)
         optimized_kin_plan = kin_optimizer.kinematics_sequence
         optimized_dyn_plan = dyn_optimizer.dynamicsSequence()
@@ -443,7 +446,7 @@ class MotionPlanner():
     def save_files1(self, kd_iter):
         time_vector = create_time_vector(self.dyn_optimizer.dynamicsSequence())
         create_file1(time_vector, self.ini_state, self.kin_optimizer.kinematics_sequence, self.dyn_optimizer.dynamicsSequence(), self.dynamics_feedback, self.planner_setting.get(PlannerDoubleParam_RobotWeight), kd_iter)
-        self.with_lqr = True
+        self.with_lqr = False
         if self.with_lqr:
             create_lqr_files1(time_vector,
                              self.kin_optimizer.motion_eff,

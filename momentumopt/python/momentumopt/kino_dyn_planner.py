@@ -115,7 +115,7 @@ def main(argv):
 
     # The default visualizer is Meshcat, if you wanna use geppeto_viewer
     # pass viz="gepetto" as an argument.
-   # motion_planner.replay_kinematics(viz="gepetto")
+    motion_planner.replay_kinematics(viz="gepetto")
 
     # Dump the computed trajectory in a files (should follow the dynamic graph format)
     motion_planner.save_files()
