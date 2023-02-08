@@ -59,15 +59,16 @@ def parse_arguments(argv):
 
     return cfg_file, RobotWrapper, with_lqr
 
-def build_optimization(cfg_file, RobotWrapper, with_lqr):
+def build_optimization(cfg_file, RobotWrapper, with_lqr, i, j):
     """
     Build the optimization problem
     """
     # create the planner
-    motion_planner = MotionPlanner(cfg_file, MomentumKinematicsOptimizer, RobotWrapper, with_lqr)
+    if i == 0 and j == 0:
+        motion_planner = MotionPlanner(cfg_file, MomentumKinematicsOptimizer, RobotWrapper, with_lqr)
 
     # load all the parameters of the planner
-    motion_planner.init_from_settings()
+    motion_planner.init_from_settings(i, j)
 
     return motion_planner
 
@@ -87,13 +88,14 @@ def optimize_motion(motion_planner, plot_com_motion=False):
            dynamics_feedback, planner_setting, time_vector
 
 
-def build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, plot_com_motion=False):
+def build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, i, j, plot_com_motion=False):
     """ Build the optimization problem and solve it in one go."""
-    motion_planner = build_optimization(cfg_file, RobotWrapper, with_lqr)
+
+    motion_planner = build_optimization(cfg_file, RobotWrapper, with_lqr,  i, j)
     optimized_kin_plan, optimized_motion_eff, optimized_dyn_plan, \
       dynamics_feedback, planner_setting, time_vector = \
           optimize_motion(motion_planner, plot_com_motion)
-
+    
     return motion_planner, optimized_kin_plan, optimized_motion_eff, \
            optimized_dyn_plan, dynamics_feedback, planner_setting, time_vector
 
@@ -104,14 +106,15 @@ def main(argv):
     """
     # Get the arguments
     cfg_file, RobotWrapper, with_lqr = parse_arguments(argv)
-
+    i = 0
+    j = 0
     # Compute the motion
     (motion_planner, optimized_kin_plan,
      optimized_motion_eff,
      optimized_dyn_plan,
      dynamics_feedback,
      planner_setting,
-     time_vector) = build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr)
+     time_vector) = build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, i, j)
 
     # The default visualizer is Meshcat, if you wanna use geppeto_viewer
     # pass viz="gepetto" as an argument.

@@ -21,6 +21,7 @@ from pymomentum import *
 from momentumopt.kinoptpy.momentum_kinematics_optimizer import MomentumKinematicsOptimizer, EndeffectorTrajectoryGenerator
 from momentumopt.kinoptpy.create_data_file import create_file, create_file1, create_qp_files, create_lqr_files, create_lqr_files1
 from momentumopt.motion_execution import desired_state
+import pinocchio as se3
 import pickle
 from copy import copy
 
@@ -40,11 +41,11 @@ class MotionPlanner():
 
     def __init__(self, cfg_file, KinOpt=MomentumKinematicsOptimizer,
                  RobotWrapper=QuadrupedWrapper, with_lqr=False):
+        
         'define problem configuration'
-
         self.planner_setting = PlannerSetting()
         self.planner_setting.initialize(cfg_file)
-
+        
         self.dynlqr_setting = SolverLqrSetting()
         self.dynlqr_setting.initialize(cfg_file, "solverlqr_dynamics")
 
@@ -72,28 +73,55 @@ class MotionPlanner():
 
         'Kinematics Optimizer'
         self.kin_optimizer = KinOpt()
-        #self.KinematicsInterface = KinematicsInterface() KinematicsOptimizer()#
-        #self.KinematicsInterface.initialize(self.planner_setting)
-        #self.KinematicsInterface.internalInitialization(self.planner_setting)
         self.kin_optimizer.initialize(self.planner_setting, RobotWrapper=RobotWrapper)
         self.dynamics_feedback = None
         self.with_lqr = with_lqr
         self.kd_iter1 = 0
-
+        
         self.crocs_data = dict()
         self.crocs_data['Right'] = dict()
-        #self.crocs_data['foot_poses'] = []
-        #self.crocs_data['trajs'] = []
-        #self.crocs_data['x'] = []
-        #self.crocs_data['vel_trajs'] = [] 
         self.crocs_data['Right']['x_inputs'] = []
         self.crocs_data['Right']['x_state'] = []        
         self.crocs_data['Right']['u_trajs'] = []
-        #self.crocs_data['data_phases_set'] = []
-       # self.crocs_data['costs'] = []
-        #self.crocs_data['iters'] = []
 
-    def init_from_settings(self):
+    def init_from_settings(self, i=0, j=0):
+        
+        self.kin_optimizer.robot.modelUpdateinit()
+        PELV_move = [0.01*i, 0.0, 0.0]
+        self.kin_optimizer.robot.PELV_tran = self.kin_optimizer.robot.PELV_tran + PELV_move
+        self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
+        qdot = se3.utils.zero(self.kin_optimizer.robot.model.nv)
+        qinit = se3.utils.zero(self.kin_optimizer.robot.model.nq)
+        qinit[0:3] = self.kin_optimizer.robot.qinit[0:3] + PELV_move
+        qinit[7:] = self.kin_optimizer.robot.leg_q
+
+        #dynamic
+
+        #kinemaic
+        self.q_init = qinit
+        self.kin_optimizer.robot.modelUpdate(self.q_init)
+        self.ini_state.com = self.kin_optimizer.robot.data.com[0]
+        #self.ini_state.ZMP =
+        #self.ini_state.amom =
+        #self.ini_state.lmom =
+        #self.ini_state.amomd =
+        #self.ini_state.lmomd =
+
+        #self.ini_state.eff_positions_[0] =
+        #self.ini_state.eff_velocities_[0] =
+        #self.ini_state.eff_accelerations_[0] =
+        #self.ini_state.eff_orientations_[0] =
+        
+        
+        #self.planner_setting.set( , self.kin_optimizer.robot.data.com[0])
+        #self.qd_init =
+
+        
+        print("ddddd")
+        print(self.kin_optimizer.robot.leg_q)
+        print(self.ini_state.com)
+
+        self.kin_optimizer.robot.inverseKinematics()
         kin_optimizer = self.kin_optimizer
         inv_kin = kin_optimizer.inv_kin
         snd_order_inv_kin = kin_optimizer.snd_order_inv_kin

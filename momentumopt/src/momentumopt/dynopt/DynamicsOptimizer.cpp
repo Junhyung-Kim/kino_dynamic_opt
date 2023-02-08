@@ -371,7 +371,7 @@ namespace momentumopt {
 
         lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 11.9411*(LinExpr(vars_[com_.id(1,time_id)])-LinExpr(vars_[ZMP_.id(1,time_id)]))-LinExpr(vars_[amomd_.id(0,time_id)])/78.8188;
         model_.addLinConstr(lin_cons_, "=", 0.0);
-        std::cout << time_id << " ZMPlx " << ZMP_lx << " ZMPux " << ZMP_ux << " " <<this->getSetting().get(PlannerVectorParam_WeightZMP)  << std::endl;
+      //  std::cout << time_id << " ZMPlx " << ZMP_lx << " ZMPux " << ZMP_ux << " " <<this->getSetting().get(PlannerVectorParam_WeightZMP)  << std::endl;
       }
       
       /*for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
