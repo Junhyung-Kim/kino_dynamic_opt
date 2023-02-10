@@ -199,7 +199,6 @@ class SecondOrderInverseKinematics(object):
               joint_pos_ref, base_ori_ref):
 
         num_time_steps = com_ref.shape[0]
-
         com_kin = np.zeros_like(com_ref)
         lmom_kin = np.zeros_like(lmom_ref)
         amom_kin = np.zeros_like(amom_ref)
@@ -211,8 +210,8 @@ class SecondOrderInverseKinematics(object):
         dq_kin = np.zeros([num_time_steps,dq_init.shape[0]])
         ddq_kin = np.zeros_like(dq_kin)
 
-        inner_steps = int(dt/0.001)
-        inner_dt = 0.001
+        inner_steps = int(dt/0.002)
+        inner_dt = 0.002
         time = np.linspace(0., (num_time_steps-1)*dt, num_time_steps)
         splined_com_ref = CubicSpline(time, com_ref)
         splined_lmom_ref = CubicSpline(time, lmom_ref)
@@ -221,8 +220,7 @@ class SecondOrderInverseKinematics(object):
         splined_endeff_vel_ref = CubicSpline(time, endeff_vel_ref)
         splined_joint_pos_ref = CubicSpline(time, joint_pos_ref)
         splined_base_ori_ref = CubicSpline(time, base_ori_ref)
-
-
+        
         # store the first one
         q = q_init.copy()
         dq = dq_init.copy()
@@ -240,11 +238,12 @@ class SecondOrderInverseKinematics(object):
         dmom_ref = np.zeros([6,])
         endeff_acc_ref = np.zeros([self.ne,3])
         t = 0.
-
+        t = t + inner_dt
         for it in range(1,num_time_steps):
             for inner in range(inner_steps):
                 dmom_ref = np.hstack((splined_lmom_ref(t, nu=1),
                                    splined_amom_ref(t, nu=1)))
+                
                 endeff_acc_ref = splined_endeff_vel_ref(t, nu=1)
                 orien_ref = pin.Quaternion(pin.rpy.rpyToMatrix(splined_base_ori_ref(t)))
                 ddq = self.step(
@@ -257,8 +256,8 @@ class SecondOrderInverseKinematics(object):
                 dq += ddq * inner_dt
                 q = pin.integrate(self.robot.model, q, dq * inner_dt)
                 t += inner_dt
-
                 self.update_kinematics(q, dq)
+
             q_kin[it] = q
             dq_kin[it] = dq
             ddq_kin[it] = ddq
@@ -276,4 +275,4 @@ class SecondOrderInverseKinematics(object):
             rf_ori_kin[it] = RForient_error
             lf_ori_kin[it] = LForient_error
 
-        return q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, rf_ori_kin, lf_ori_kin
+        return q_kin, dq_kin, ddq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, rf_ori_kin, lf_ori_kin

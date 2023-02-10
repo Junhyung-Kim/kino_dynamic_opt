@@ -16,7 +16,7 @@ from momentumopt.motion_execution import desired_state, interpolate
 sample_frequency = 1 # 1kHz
 
 def create_file(time_vector, optimized_sequence, optimized_dyn_plan, dynamics_feedback, robot_weight):
-    sample_frequency = 1000 # 1kHz
+    sample_frequency = 500 # 1kHz
     desired_pos = desired_state("POSITION", time_vector, optimized_sequence=optimized_sequence)
     desired_vel = desired_state("VELOCITY", time_vector, optimized_sequence=optimized_sequence)
     desired_gen_pos = desired_state("GENERALIZED_POSITION", time_vector, optimized_sequence=optimized_sequence)
@@ -51,7 +51,7 @@ def create_file(time_vector, optimized_sequence, optimized_dyn_plan, dynamics_fe
 
     def dump_data(output_file, desired_fn, scale=1.):
         np.savetxt(output_file, np.vstack([
-            np.hstack((i, scale * desired_fn(i / 1e3))) for i in range(num_points)
+            np.hstack((i, scale * desired_fn(i / 500))) for i in range(num_points)
         ]), fmt='%.8e')
 
     if using_quadruped:

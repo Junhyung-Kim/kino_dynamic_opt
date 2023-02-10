@@ -41,6 +41,7 @@ namespace momentumopt {
 	  Eigen::Vector3d& linearMomentum() { return lmom_; }
 	  Eigen::Vector3d& angularMomentum() { return amom_; }
 	  Eigen::Vector2d& ZMP() { return ZMP_; }
+    Eigen::Vector2d& ZMPd() { return ZMPd_; }
 	  Eigen::Vector3d& linearMomentumRate() { return lmomd_; }
 	  Eigen::Vector3d& angularMomentumRate() { return amomd_; }
 
@@ -48,6 +49,7 @@ namespace momentumopt {
 	  const Eigen::Vector3d& centerOfMass() const { return com_; }
 	  const Eigen::Vector3d& linearMomentum() const { return lmom_; }
 	  const Eigen::Vector3d& angularMomentum() const { return amom_; }
+	  //const Eigen::Vector2d& ZMPd() const { return ZMPd_; }
 	  const Eigen::Vector3d& linearMomentumRate() const { return lmomd_; }
 	  const Eigen::Vector3d& angularMomentumRate() const { return amomd_; }
 

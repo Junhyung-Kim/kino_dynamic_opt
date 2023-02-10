@@ -74,6 +74,7 @@ namespace momentumopt {
 	  YAML::ReadParameter(ini_robo_cfg, "lmom", this->linearMomentum());
 	  YAML::ReadParameter(ini_robo_cfg, "amom", this->angularMomentum());
 	  YAML::ReadParameter(ini_robo_cfg, "zmp", this->ZMP());
+    this->ZMPd().setZero();
     
 	  for (int eff_id=0; eff_id<Problem::n_endeffs_; eff_id++) {
 		Eigen::VectorXd eef_cfg = YAML::ReadParameter<Eigen::VectorXd>(ini_robo_cfg["eef_pose"], "eef_"+Problem::idToEndeffectorString(eff_id));

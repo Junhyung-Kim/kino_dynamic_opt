@@ -323,7 +323,7 @@ class MomentumKinematicsOptimizer(object):
 
     def reset(self):
         self.kinematics_sequence = KinematicsSequence()
-        self.kinematics_sequence.resize(self.planner_setting.get(PlannerIntParam_NumTimesteps),
+        self.kinematics_sequence.resize(self.planner_setting.get(PlannerIntParam_NumTimesteps)+1,
                                         self.planner_setting.get(PlannerIntParam_NumDofs))
 
     def initialize(self, planner_setting, max_iterations=50, eps=0.001, endeff_traj_generator=None,
@@ -335,7 +335,7 @@ class MomentumKinematicsOptimizer(object):
         self.endeff_traj_generator = endeff_traj_generator
 
         self.dt = planner_setting.get(PlannerDoubleParam_TimeStep)
-        self.num_time_steps = planner_setting.get(PlannerIntParam_NumTimesteps)
+        self.num_time_steps = planner_setting.get(PlannerIntParam_NumTimesteps) + 1
 
         self.max_iterations = max_iterations
         self.eps = eps
@@ -384,7 +384,7 @@ class MomentumKinematicsOptimizer(object):
         self.endeff_pos_ref, self.endeff_vel_ref, self.endeff_contact = \
                 self.endeff_traj_generator(self)
 
-    def fill_kinematic_result(self, it, q, dq):
+    def fill_kinematic_result(self, it, q, dq, ddq):
         def framesPos(frames):
             
             return np.vstack([data.oMf[idx].translation for idx in frames]).reshape(-1)
@@ -428,6 +428,7 @@ class MomentumKinematicsOptimizer(object):
         kinematic_state.robot_velocity.base_linear_velocity = dq[:3]
         kinematic_state.robot_velocity.base_angular_velocity = dq[3:6]
         kinematic_state.robot_velocity.joint_velocities = dq[6:]
+        kinematic_state.robot_acceleration.generalized_joint_accelerations = ddq
 
 
     def optimize_initial_position(self, init_state):
@@ -527,13 +528,13 @@ class MomentumKinematicsOptimizer(object):
         
         if self.use_second_order_inv_kin:
 
-            q_kin, dq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, self.rf_ori_kin, self.lf_ori_kin= \
+            q_kin, dq_kin, ddq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, self.rf_ori_kin, self.lf_ori_kin= \
                 self.snd_order_inv_kin.solve(self.dt, q, dq, self.com_dyn, self.lmom_dyn,
                     self.amom_dyn, self.endeff_pos_ref, self.endeff_vel_ref,
                     self.endeff_contact, self.joint_des.T, self.base_des.T)
-            for it, (q, dq) in enumerate(zip(q_kin, dq_kin)):
+            for it, (q, dq, ddq) in enumerate(zip(q_kin, dq_kin, ddq_kin)):
                 self.inv_kin.forward_robot(q, dq)
-                self.fill_kinematic_result(it, q, dq) 
+                self.fill_kinematic_result(it, q, dq, ddq) 
         
                 #print(self.q_kin[it])
                 #print("dq")
