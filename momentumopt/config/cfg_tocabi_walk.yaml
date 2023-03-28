@@ -50,13 +50,13 @@ contact_plan:
                             # -1.0 : no contact planning
   #zmp 수정 필요
   effcnt_rf:
-  - [0.0, 0.2, 9.47987102e-02, -0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
-  - [1.0, 2.40, 0.1947, -0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
+  - [0.0, 1.2, 9.47987102e-02, -0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
+  - [1.8, 2.20, 0.1947, -0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
   #- [2.28, 2.60, 0.544, -0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
 
   effcnt_lf:
-  - [0.0, 1.2, 9.47987102e-02, 0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
-  - [2.0, 2.40, 0.1947, 0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
+  - [0.0, 0.2, 9.47987102e-02, 0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
+  - [0.8, 2.20, 0.1947, 0.1025, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0]
   
   effcnt_rh: #redundant for bolt because it does not have hands
   - [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -83,7 +83,7 @@ planner_variables:
   num_dofs: 12
 
   # Number of dynamic and kinematic optimization iterations
-  kd_iterations: 1 #25
+  kd_iterations: 2 #25
   num_subsamples: 3
   active_dofs: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   min_joint_limits: [-2, -2, -3, -2, -2, -2, -2, -2, -3, -2, -2, -2]
@@ -107,11 +107,11 @@ planner_variables:
   # joint via point definition
   #  [time,                      # activation time of the via point
   # Front_left_hip, Front_left_knee,
-  # Front_right_hip, Front_right_knee,
+  # Front_right_hip, Front_right_knee,build_and_optimize_motion
   # Back_left_hip, Back_left_knee,
   # Back_right_hip, Back_right_knee ]        # desired joint position
   joint_viapoints:
-    via0: [0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
+    via0: [0, 0, 0.82473, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
   # base via point definition
   #  [time,                      # activation time of the via point
   # roll, pitch, yaw]        # desired base Euler angles in radian
@@ -123,23 +123,23 @@ planner_variables:
   #########################
 
   swing_traj_via_z_second: 0.03
-  w_lin_mom_tracking_second: 9e6
-  w_ang_mom_tracking_second: 4e5
-  w_endeff_contact_second: 5e4
-  w_endeff_tracking_second: 3e3
-  w_endori_contact_second: 1e5
-  w_endori_tracking_second: 1e5
-  w_joint_regularization_second: 0.005
+  w_lin_mom_tracking_second: 1e2
+  w_ang_mom_tracking_second: 0.5
+  w_endeff_contact_second: 5e1
+  w_endeff_tracking_second: 3e1
+  w_endori_contact_second: 1e2
+  w_endori_tracking_second: 1e1
+  w_joint_regularization_second: 0.01
   p_endeff_tracking_second: 1e4
-  d_endeff_tracking_second: 5e2
-  p_com_tracking_second: 7e3
-  p_orient_tracking_second: 500
-  d_orient_tracking_second: 40
-  p_orientf_tracking_second: 30.0
-  d_orientf_tracking_second: 2.0
-  p_joint_regularization_second: 0.09
-  d_joint_regularization_second: 0.006
-  p_mom_tracking_second: [25.0, 15.0, 5.0, 0.1, 0.5, 0.1]
+  d_endeff_tracking_second: 1e2
+  p_com_tracking_second: 6e4
+  p_orient_tracking_second: 1e3
+  d_orient_tracking_second: 5e1
+  p_orientf_tracking_second: 1e2
+  d_orientf_tracking_second: 5e1
+  p_joint_regularization_second: 0.01
+  d_joint_regularization_second: 0.001
+  p_mom_tracking_second: [2.0, 2.0, 0.0, 2.0, 2.0, 0.0]
   num_joint_viapoints_second: 0
   num_base_viapoints_second: 0
 
@@ -150,7 +150,7 @@ planner_variables:
   # Back_left_hip, Back_left_knee,
   # Back_right_hip, Back_right_knee ]        # desired joint position
   joint_viapoints_second:
-    via0: [0, 0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
+    via0: [0, 0, 0, 0.82473, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
 
   # base via point definition
   #  [time,                      # activation time of the via point
@@ -171,8 +171,8 @@ planner_variables:
   heuristic: TrustRegion  # Types: TrustRegion, SoftConstraint, TimeOptimization #
   n_act_eefs: 2
   # time step discretization
-  time_step: 0.002 #0.002
-  time_horizon: 2.400
+  time_step: 0.010 #0.005
+  time_horizon: 2.200
   external_force: [0.00, 0.00, 0.00]
   com_displacement: [0.10, 0.0, 0.00]
   # Will only read via points if this number is great than 0
@@ -200,7 +200,7 @@ planner_variables:
   friction_coeff: 0.5
   floor_height: 0.0
   # minimum allowed distance from the robot base to the floor
-  min_rel_height: 0.80783
+  min_rel_height: 0.82473
   friction_cone: LinearCone  # Types: LinearCone, SocCone #
   time_range: [0.02, 0.02]
   is_time_horizon_fixed: true
@@ -209,8 +209,8 @@ planner_variables:
   eff_offset_lf: [9.47987102e-02, 1.02500000e-01, 6.43027992e-10]
   eff_offset_rh: []
   eff_offset_lh: []
-  cop_range_rf: [-0.10, 0.10, -0.05, 0.05]
-  cop_range_lf: [-0.10, 0.10, -0.05, 0.05]
+  cop_range_rf: [-0.10, 0.10, -0.04, 0.04]
+  cop_range_lf: [-0.10, 0.10, -0.04, 0.04]
   cop_range_rh: []
   cop_range_lh: []
   max_eef_lengths: [1.3, 1.3, 1.3, 1.3]
@@ -227,13 +227,13 @@ planner_variables:
   w_time_penalty: 0.000
   w_time: 1000.0
   w_com: [100000000., 100000000.0, 550000] #cost weight of final com position
-  w_amom: [0.1, 0.1, 0.1]
-  w_lmom: [0.1, 0.1, 0.1]
-  w_amomd: [0.300, 0.342, 0.100]
-  w_lmomd: [1.0, 0.1, 5.0]
+  w_amom: [1.0, 2.0, 0.0]
+  w_lmom: [0.01, 0.1, 0.0]
+  w_amomd: [1.0, 1.0, 0.00]
+  w_lmomd: [0.01, 0.01, 0.0]
   w_zmp: [1, 5]
   w_zmpd: [5000,5000]
-  w_zmpc: [450000, 300000]
+  w_zmpc: [50000, 700000]
   
   w_amom_final: [10.00, 10.0, 10.00] # cost weight of final linear momentum
   w_lmom_final: [10.00, 10.0, 10.00] # cost weight of final angular momentum
@@ -242,9 +242,9 @@ planner_variables:
   w_frc_leg: [0.0, 0.0, 0.0]
   w_dfrc_arm: [0.050, 0.05, 0.020]
   w_dfrc_leg: [0.050, 0.05, 0.020]
-  w_com_track: [5300000.00, 8000000.00, 170000.000] #cost weight of tracking of com trajectory from kinematic planner
-  w_lmom_track: [30.00, 30.00, 5.00] #cost weight of tracking of linear momentum trajectory from kinematic planner
-  w_amom_track: [280.000, 280.00, 30.000] #cost weight of tracking of angular momentum trajectory from kinematic planner
+  w_com_track: [300000.00, 300000.00, 5000.000] #cost weight of tracking of com trajectory from kinematic planner
+  w_lmom_track: [1.00, 1.00, 0.00] #cost weight of tracking of linear momentum trajectory from kinematic planner
+  w_amom_track: [400.000, 400.00, 0.00] #cost weight of tracking of angular momentum trajectory from kinematic planner
 
   ######################
   # Kinematics weights #
@@ -297,9 +297,9 @@ solverlqr_dynamics:
   cost_change_tolerance: 1e-9
   divergence_limit_check: 1e6
   bpass_regularization_type: 2
-  bpass_min_regularization: 1e-6
+  bpass_min_regularization: 1e-8
   bpass_max_regularization: 1e10
-  control_gradient_tolerance: 1e-6
+  control_gradient_tolerance: 1e-8
   bpass_initial_regularization: 0.1
   min_expected_cost_improvement: 0.2
   bpass_mult_regularization_incr: 1.2
@@ -309,8 +309,8 @@ solverlqr_dynamics:
   # Lqr problem parameters #
   ##########################
   problem_name: DynamicMomentumOptimization
-  time_step: 0.20
-  time_horizon: 2.600
+  time_step: 0.010
+  time_horizon: 2.200
   state_dimension: 9
   control_dimension: 12
   initial_state: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -353,7 +353,7 @@ solver_variables:
   ##########################
 
   feasibility_tolerance: 1e-7
-  max_residual_tolerance: 1e-3
+  max_residual_tolerance: 1e-7
   absolute_suboptimality_gap: 1e-7
   relative_suboptimality_gap: 1e-6
   max_indeterminate_tolerance: 1e-9
@@ -407,7 +407,7 @@ solver_variables:
   ####################
 
   verbose: false
-  warm_start: True
+  warm_start: false
 
   max_iters: 100
   ipsolver_max_iters: 100

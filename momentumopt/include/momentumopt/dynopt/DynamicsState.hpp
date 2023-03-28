@@ -49,13 +49,16 @@ namespace momentumopt {
 	  const Eigen::Vector3d& centerOfMass() const { return com_; }
 	  const Eigen::Vector3d& linearMomentum() const { return lmom_; }
 	  const Eigen::Vector3d& angularMomentum() const { return amom_; }
-	  //const Eigen::Vector2d& ZMPd() const { return ZMPd_; }
+	  const Eigen::Vector2d& ZMP() const { return ZMP_; }
+	  const Eigen::Vector2d& ZMPd() const { return ZMPd_; }
 	  const Eigen::Vector3d& linearMomentumRate() const { return lmomd_; }
 	  const Eigen::Vector3d& angularMomentumRate() const { return amomd_; }
 
 	  void time(const double& dtime) { dtime_ = dtime; }
 	  void centerOfMass(const Eigen::Vector3d& com) { com_ = com; }
-	  void linearMomentum(const Eigen::Vector3d& lmom) { lmom_ = lmom; }
+    void ZMP(const Eigen::Vector2d& zmp) { ZMP_ = zmp; }
+    void ZMPd(const Eigen::Vector2d& zmpd) { ZMPd_ = zmpd; }
+    void linearMomentum(const Eigen::Vector3d& lmom) { lmom_ = lmom; }
 	  void angularMomentum(const Eigen::Vector3d& amom) { amom_ = amom; }
 	  void linearMomentumRate(const Eigen::Vector3d& lmomd) { lmomd_ = lmomd; }
 	  void angularMomentumRate(const Eigen::Vector3d& amomd) { amomd_ = amomd; }
@@ -120,11 +123,11 @@ namespace momentumopt {
 	  std::string toString() const;
 	  friend std::ostream& operator<<(std::ostream &os, const DynamicsState& obj) { return os << obj.toString(); }
 	  void fillInitialRobotState(const std::string cfg_file, const std::string robot_state = "initial_robot_configuration");
-
+	  
     private:
-	  double dtime_;
-    Eigen::Vector2d ZMP_, ZMPd_;
-	  Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_;
+      double dtime_;
+      Eigen::Vector2d ZMP_, ZMPd_;
+      Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_;
       std::array<bool, Problem::n_endeffs_> eff_activations_;
       std::array<int, Problem::n_endeffs_> eff_ids_, cnt_ids_;
 

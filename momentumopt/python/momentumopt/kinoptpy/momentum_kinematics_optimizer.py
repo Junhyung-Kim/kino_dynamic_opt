@@ -219,6 +219,7 @@ class EndeffectorTrajectoryGenerator(object):
 
         # Compute the endeffector position and velocity trajectories.
         endeff_pos_ref = np.zeros((num_time_steps, num_eff, 3))
+        endeff_pos_ref1 = np.zeros((num_eff, num_time_steps, 3))
         endeff_vel_ref = np.zeros((num_time_steps, num_eff, 3))
         endeff_contact = np.zeros((num_time_steps, num_eff))
         
@@ -257,6 +258,8 @@ class EndeffectorTrajectoryGenerator(object):
 
                     endeff_pos_ref[it][eff] = np.array([x, y, z])
                     endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
+                    endeff_pos_ref1[eff][it] = np.array([x, y, z])
+
                 else:
                     x = self.quinticSpline(it, int(eff_traj_poly1[6* num_step1, 0]), int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 1], eff_traj_poly1[6*num_step1 + 1, 1], eff_traj_poly1[6* num_step1 + 2, 1], eff_traj_poly1[6*num_step1 + 3, 1], eff_traj_poly1[6* num_step1 + 4, 1], eff_traj_poly1[6*num_step1 + 5, 1])
                     xv = self.quinticSplineDot(it, int(eff_traj_poly1[6* num_step1, 0]), int(eff_traj_poly1[6*num_step1 + 5, 0]), eff_traj_poly1[6* num_step1, 1], eff_traj_poly1[6*num_step1 + 1, 1], eff_traj_poly1[6* num_step1 + 2, 1], eff_traj_poly1[6*num_step1 + 3, 1], eff_traj_poly1[6* num_step1 + 4, 1], eff_traj_poly1[6*num_step1 + 5, 1])
@@ -271,6 +274,11 @@ class EndeffectorTrajectoryGenerator(object):
                     
                     endeff_pos_ref[it][eff] = np.array([x, y, z])
                     endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
+                    endeff_pos_ref1[eff][it] = np.array([x, y, z])
+        np.savetxt("/home/jhk/ssd_mount/lfoot.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/ssd_mount/rfoot.txt", endeff_pos_ref1[1])
+                
+
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 
 
@@ -539,20 +547,19 @@ class MomentumKinematicsOptimizer(object):
                 #print(self.q_kin[it])
                 #print("dq")
                 #print(self.dq_kin[it])
-                print("com_kin")
-                print(com_kin[it]) 
-                print("base_kin")
-                print(self.q_kin[it][0:7]) 
+                #print("com_kin")#print
+                #print("base_kin")
+                #print(self.q_kin[it][0:7]) 
                 #print("eff_kin")
                 #print(self.q_kin[it][0:7]) 
-                print("Eff_con1")
-                print(self.endeff_pos_ref[it])
-                print("Eff_con")
-                print(endeff_pos_kin[it])
-                print("rf_ori_kin")
-                print(self.rf_ori_kin[it])
-                print("lf_ori_kin")
-                print(self.lf_ori_kin[it])
+                #print("Eff_con1")
+                #print(self.endeff_pos_ref[it])
+                #print("Eff_con")
+                #print(endeff_pos_kin[it])
+                #print("rf_ori_kin")
+                #print(self.rf_ori_kin[it])
+                #print("lf_ori_kin")
+                #print(self.lf_ori_kin[it])
                 
         else:
             for it in range(self.num_time_steps):

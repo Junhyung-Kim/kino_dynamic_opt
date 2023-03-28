@@ -71,7 +71,7 @@ def create_file(time_vector, optimized_sequence, optimized_dyn_plan, dynamics_fe
         dump_data("quadruped_comDyn_old.dat", desired_comdy)
         dump_data("quadruped_lmomDyn_old.dat", desired_lmomdy)
         dump_data("quadruped_amomDyn_old.dat", desired_amomdy)
-    #    dump_data("quadruped_EFF.dat", desired_EFF)
+        #dump_data("quadruped_EFF.dat", desired_EFF)
         # dump_data("quadruped_dyn_feedback.dat", desired_dyn_feedback)
     else:  # using teststand
         des_positions = np.zeros((num_points, 3))
@@ -90,9 +90,9 @@ def create_file1(time_vector, ini_state, optimized_sequence, optimized_dyn_plan,
 
     desired_pos = desired_state("POSITION", time_vector, optimized_sequence=optimized_sequence)
     desired_vel = desired_state("VELOCITY", time_vector, optimized_sequence=optimized_sequence)
-   # desired_gen_pos = desired_state("GENERALIZED_POSITION", time_vector, optimized_sequence=optimized_sequence)
-   # desired_gen_vel = desired_state("GENERALIZED_VELOCITY", time_vector, optimized_sequence=optimized_sequence)
-   # desired_gen_acc = desired_state("GENERALIZED_ACCELERATION", time_vector, optimized_sequence=optimized_sequence)
+    desired_gen_pos = desired_state("GENERALIZED_POSITION", time_vector, optimized_sequence=optimized_sequence)
+    desired_gen_vel = desired_state("GENERALIZED_VELOCITY", time_vector, optimized_sequence=optimized_sequence)
+    desired_gen_acc = desired_state("GENERALIZED_ACCELERATION", time_vector, optimized_sequence=optimized_sequence)
     desired_com = desired_state("COM", time_vector, optimized_sequence=optimized_sequence)
     desired_lmom = desired_state("LMOM", time_vector, optimized_sequence=optimized_sequence)
     desired_amom = desired_state("AMOM", time_vector, optimized_sequence=optimized_sequence)
@@ -102,6 +102,7 @@ def create_file1(time_vector, ini_state, optimized_sequence, optimized_dyn_plan,
                                     optimized_dyn_plan=optimized_dyn_plan)
     desired_amomdy = desired_state("AMOMDY", time_vector, optimized_sequence=optimized_sequence,
                                     optimized_dyn_plan=optimized_dyn_plan)
+    #desired_EFF = desired_state("EFF_POSITION", time_vector, optimized_sequence=optimized_sequence, kin_optimizer=kin_optimizer)
     desired_cop = desired_state("COP", time_vector, optimized_sequence=optimized_sequence,
                                     optimized_dyn_plan=optimized_dyn_plan)
     desired_eori = desired_state("ENDEFFECTORORI", time_vector, optimized_sequence=optimized_sequence,
@@ -126,12 +127,12 @@ def create_file1(time_vector, ini_state, optimized_sequence, optimized_dyn_plan,
         dump_data(text, desired_pos)
         text = "quadruped_velocities" + iter + ".dat"
         dump_data(text, desired_vel)
-        #  text = "quadruped_generalized_positions" + iter + ".dat"
-      #  dump_data(text, desired_gen_pos)
-      #  text = "quadruped_generalized_velocities" + iter + ".dat"
-      #  dump_data(text, desired_gen_vel)
-      #  text = "quadruped_generalized_acceleration" + iter + ".dat"
-      #  dump_data(text, desired_gen_acc)
+        text = "quadruped_generalized_positions" + iter + ".dat"
+        dump_data(text, desired_gen_pos)
+        text = "quadruped_generalized_velocities" + iter + ".dat"
+        dump_data(text, desired_gen_vel)
+        text = "quadruped_generalized_acceleration" + iter + ".dat"
+        dump_data(text, desired_gen_acc)
         text = "quadruped_com_old" + iter + ".dat"
         dump_data(text, desired_com)
         text = "quadruped_lmom_old" + iter + ".dat"
@@ -148,7 +149,7 @@ def create_file1(time_vector, ini_state, optimized_sequence, optimized_dyn_plan,
         dump_data(text, desired_cop)
         text = "quadruped_end_ori" + iter + ".dat"
         dump_data(text, desired_eori)
-        #    dump_data("quadruped_EFF.dat", desired_EFF)
+        #dump_data("quadruped_EFF.dat", desired_EFF)
             # dump_data("quadruped_dyn_feedback.dat", desired_dyn_feedback)
     else:  # using teststand
         des_positions = np.zeros((num_points, 3))

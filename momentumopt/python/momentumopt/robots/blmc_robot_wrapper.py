@@ -324,8 +324,8 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         contactPointLF = pinocchio.SE3.Identity()
         contactPointRF = pinocchio.SE3.Identity()
         
-        contactPointLF.translation.T.flat = [0.03, 0, -0.14151976]
-        contactPointRF.translation.T.flat = [0.03, 0, -0.14151976]
+        contactPointLF.translation.T.flat = [0.03, 0, -0.1585]
+        contactPointRF.translation.T.flat = [0.03, 0, -0.1585]
 
         self.LFframe_id = self.model.getFrameId("L_Foot_Link")
         self.RFframe_id = self.model.getFrameId("R_Foot_Link")
@@ -348,7 +348,7 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         self.robot.data = self.model.createData()
         self.data = self.robot.data
         initial_configuration = np.array(
-            [0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
+            [0, 0, 0.82473, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
         )        
         self.q = initial_configuration
         self.qinit = initial_configuration
@@ -357,17 +357,25 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         else:
             self.q = None
         self.M_com = None
+        self.PelvJ = pinocchio.utils.zero((6, self.model.nv))
+        self.LFcJ = pinocchio.utils.zero((6, self.model.nv))
+        self.RFcJ = pinocchio.utils.zero((6, self.model.nv))
 
         self.mass = sum([i.mass for i in self.model.inertias[1:]])
         self.modelUpdateinit()
         self.inverseKinematics(0.0, self.LF_rot, self.RF_rot, self.PELV_rot, self.LF_tran, self.RF_tran, self.PELV_tran, self.HRR_tran_init, self.HLR_tran_init, self.HRR_rot_init, self.HLR_rot_init, self.PELV_tran_init, self.PELV_rot_init, self.CPELV_tran_init)
-
+        print("pelv")
+        print(self.PELV_tran)
+        print(self.RF_tran)
+        print(self.LF_tran)
+        print(self.LFc_tran)
+        print(self.leg_q)
         self.set_init_config()
 
     def modelUpdateinit(self):
         q = pinocchio.randomConfiguration(self.model)
         qdot = pinocchio.utils.zero(self.model.nv)
-        q_init = [0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
+        q_init = [0, 0, 0.82473, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
   
         for i in range(0, len(q)):
             q[i] = q_init[i]
@@ -376,8 +384,14 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         pinocchio.updateFramePlacements(self.model, self.data)
         pinocchio.updateGlobalPlacements(self.model, self.data)
         pinocchio.centerOfMass(self.model, self.data, q, False)
+        pinocchio.computeJointJacobians(self.model, self.data)
+        self.PelvJ = pinocchio.computeFrameJacobian(self.model, self.data, q, self.PELVframe_id)
+        self.RFcJ = pinocchio.computeFrameJacobian(self.model, self.data, q, self.RFcframe_id)
+        self.LFcJ = pinocchio.computeFrameJacobian(self.model, self.data, q, self.LFcframe_id)
         self.LF_tran = self.data.oMi[self.LFjoint_id].translation
         self.RF_tran = self.data.oMi[self.RFjoint_id].translation
+        self.LFc_tran = self.data.oMf[self.LFcframe_id].translation
+        self.RFc_tran = self.data.oMf[self.RFcframe_id].translation
         self.LF_rot = self.data.oMi[self.LFjoint_id].rotation
         self.RF_rot = self.data.oMi[self.RFjoint_id].rotation    
         self.HLR_rot_init = self.data.oMi[self.LHjoint_id].rotation
@@ -391,26 +405,32 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         self.PELV_rot_init = self.data.oMi[self.PELVjoint_id].rotation
         self.PELV_tran = np.add(self.data.oMi[self.PELVjoint_id].translation, self.model.inertias[self.PELVjoint_id].lever)
 
-    def modelUpdate(self, q_):
+    def modelUpdate(self, q_, qdot_):
         q = pinocchio.randomConfiguration(self.model)
         qdot = pinocchio.utils.zero(self.model.nv)
-        
+
         for i in range(0, len(q)):
             q[i] = q_[i]
-        #for i in range(0, len(qdot)):
-        #    qdot[i] = qdot_[i]
-
+        for i in range(0, len(qdot)):
+            qdot[i] = qdot_[i]
+        
         pinocchio.forwardKinematics(self.model, self.data, q, qdot)
         pinocchio.updateFramePlacements(self.model, self.data)
-        pinocchio.updateGlobalPlacements(self.model, self.data)
         pinocchio.centerOfMass(self.model, self.data, q, False)
+        pinocchio.computeCentroidalMomentum(self.model, self.data, q, qdot)
+        self.PelvJ = pinocchio.computeFrameJacobian(self.model, self.data, q, self.PELVframe_id)
+        self.RFcJ = pinocchio.computeFrameJacobian(self.model, self.data, q, self.RFcframe_id)
+        self.LFcJ = pinocchio.computeFrameJacobian(self.model, self.data, q, self.LFcframe_id)
         self.LF_tran = self.data.oMi[self.LFjoint_id].translation
         self.RF_tran = self.data.oMi[self.RFjoint_id].translation
+        self.LFc_tran = self.data.oMf[self.LFcframe_id].translation
+        self.RFc_tran = self.data.oMf[self.RFcframe_id].translation
         self.LF_rot = self.data.oMi[self.LFjoint_id].rotation
         self.RF_rot = self.data.oMi[self.RFjoint_id].rotation    
         self.PELV_tran = self.data.oMf[self.PELVframe_id].translation
         self.PELV_rot = self.data.oMf[self.PELVframe_id].rotation
         self.PELV_tran = np.add(self.data.oMi[self.PELVjoint_id].translation, self.model.inertias[self.PELVjoint_id].lever)
+        self.hg = self.data.hg
 
     def set_init_config(self):
         model = self.model
@@ -421,7 +441,7 @@ class BipedTocabiWrapper(BasicRobotWrapper):
 
 #        self.q = pinocchio.neutral(self.robot.model)
         initial_configuration = np.array(
-            [0, 0, 0.80783, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
+            [0, 0, 0.82473, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
         )        
         self.q = initial_configuration
 

@@ -79,26 +79,67 @@ class MotionPlanner():
         self.kd_iter1 = 0
 
     def init_from_settings(self, i=0, j=0):
-        
         self.kin_optimizer.robot.modelUpdateinit()
-        PELV_move = [0.01*i, 0.0, 0.0]
+        PELV_move = [-0.01*(i), 0.008*(j-9.5), 0.0]
+        PELV_ori_move = [0.0, 0.0, 0.0]
+        PELVd_move = [0.0, 0.0, 0.0]
+        zmp_move = [0, 0]
+        PELVd_ori_move = [0.0, 0.0, 0.0]
+        print("i")
+        print(i)
+        print("j")
+        print(j)
+
+        print(self.kin_optimizer.robot.PELV_tran)
         self.kin_optimizer.robot.PELV_tran = self.kin_optimizer.robot.PELV_tran + PELV_move
+        print(self.kin_optimizer.robot.PELV_tran)
+        self.kin_optimizer.robot.PELVd_tran = PELVd_move
+        self.kin_optimizer.robot.PELV_rot = se3.rpy.rpyToMatrix(PELV_ori_move[0],PELV_ori_move[1],PELV_ori_move[2])
         self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
         qdot = se3.utils.zero(self.kin_optimizer.robot.model.nv)
         qinit = se3.utils.zero(self.kin_optimizer.robot.model.nq)
+        qinit_ = se3.utils.zero(self.kin_optimizer.robot.model.nq)
+        leg_q = se3.utils.zero(12)
+        
+        leg_q = self.kin_optimizer.robot.leg_q
+        print(leg_q)
         qinit[0:3] = self.kin_optimizer.robot.qinit[0:3] + PELV_move
-        qinit[6] = 1.0
+        qinit[3] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).x
+        qinit[4] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).y
+        qinit[5] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).z
+        qinit[6] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).w
         qinit[7:] = self.kin_optimizer.robot.leg_q
+        qinit_ = copy(qinit)
+        qdot[0:3] = PELVd_move
+        qdot[3:6] = PELVd_ori_move
+        qinit_ = se3.integrate(self.kin_optimizer.robot.model, qinit_, qdot*0.010)
+        
+        self.kin_optimizer.robot.PELV_rot = se3.utils.XYZQUATToSe3(qinit_[0:7]).rotation
 
-        #dynamic
+        for i in range(0,3):
+            self.kin_optimizer.robot.PELV_tran[i] = self.kin_optimizer.robot.PELV_tran[i] + PELVd_move[i] * 0.010
+        
+        self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
+        
+        qdot[6:] = (self.kin_optimizer.robot.leg_q - leg_q)/0.010
 
-        #kinemaic
         self.kin_optimizer.q_init = qinit
-        self.kin_optimizer.robot.modelUpdate(qinit)
+        self.kin_optimizer.dq_init = qdot
+
+        qinit = se3.integrate(self.kin_optimizer.robot.model, qinit, qdot*0.010)
+        
+        self.kin_optimizer.robot.modelUpdate(qinit, qdot)
+        zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1]]
+        for i in range(0,2):
+            zmp[i] = zmp[i] + zmp_move[i]
+        
         self.ini_state.com = self.kin_optimizer.robot.data.com[0]
-        self.ini_state.zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1]]
-        #self.ini_state.amom =
-        #self.ini_state.lmom =
+        self.ini_state.lmom = self.kin_optimizer.robot.hg.linear #self.kin_optimizer.robot.data.com[1] * self.kin_optimizer.snd_order_inv_kin.robot_mass
+        self.ini_state.amom = self.kin_optimizer.robot.hg.angular
+        self.ini_state.zmp = zmp
+        self.kin_optimizer.ini_state = self.ini_state
+        
+
         #self.ini_state.amomd =
         #self.ini_state.lmomd =
 
@@ -110,10 +151,6 @@ class MotionPlanner():
         
         #self.planner_setting.set( , self.kin_optimizer.robot.data.com[0])
         #self.qd_init =
-
-        print("ddddd")
-        print(self.kin_optimizer.robot.leg_q)
-        print(self.ini_state.com)
 
         #self.kin_optimizer.robot.inverseKinematics()
         kin_optimizer = self.kin_optimizer

@@ -8,6 +8,7 @@
 
 #include <iomanip>
 #include <fstream>
+#include <iostream>
 #include <yaml-cpp/yaml.h>
 #include <momentumopt/dynopt/DynamicsOptimizer.hpp>
 
@@ -65,10 +66,13 @@ namespace momentumopt {
                                        const KinematicsSequence& kin_sequence, bool update_tracking_objective)
   {
     ini_state_ = ini_state;
+    std::cout << ini_state_.centerOfMass() << std::endl;
+    std::cout << "zmp" << std::endl;
+    std::cout << ini_state_.ZMP() << std::endl;
     contact_plan_ = contact_plan;
-    std::cout <<"ZMP" << std::endl;
     weight_desired_com_tracking_.setZero();
-    com_pos_goal_ = ini_state_.centerOfMass() + this->getSetting().get(PlannerVectorParam_CenterOfMassMotion);
+    //com_pos_goal_ = ini_state_.centerOfMass() + this->getSetting().get(PlannerVectorParam_CenterOfMassMotion);
+    com_pos_goal_<< 1.861938268e-01, 5.18219890e-06, ini_state_.centerOfMass()(2);
     contact_plan_->fillDynamicsSequence(ini_state, this->dynamicsSequence());
     this->initializeOptimizationVariables();
 
@@ -128,7 +132,9 @@ namespace momentumopt {
       }
 */
 
-      double ZMP_ux, ZMP_lx, ZMP_uy, ZMP_ly;    
+      double ZMP_ux, ZMP_lx, ZMP_uy, ZMP_ly;
+      std::fstream file1;
+      file1.open("/home/jhk/ssd_mount/zmp1.txt",std::ios_base::out);    
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         for (int axis_id=0; axis_id<2; axis_id++) {
           // penalty on center of mass, linear and angular momentum with Kinematics
@@ -144,13 +150,13 @@ namespace momentumopt {
         
           if (this->getSetting().heuristic() == Heuristic::TimeOptimization) {
           } else {
-            if (time_id==0) {
+            /*if (time_id==0) {
               quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightLinearMomentumRate)[axis_id], (LinExpr(vars_[lmom_.id(axis_id,time_id)]) - LinExpr(ini_state_.linearMomentum()[axis_id]))*(1.0/dynamicsSequence().dynamicsState(time_id).time()));
               quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightAngularMomentumRate)[axis_id], (LinExpr(vars_[amom_.id(axis_id,time_id)]) - LinExpr(ini_state_.angularMomentum()[axis_id]))*(1.0/dynamicsSequence().dynamicsState(time_id).time()));
             } else {
               quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightLinearMomentumRate)[axis_id], (LinExpr(vars_[lmom_.id(axis_id,time_id)]) - LinExpr(vars_[lmom_.id(axis_id,time_id-1)]))*(1.0/dynamicsSequence().dynamicsState(time_id).time()));
               quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightAngularMomentumRate)[axis_id], (LinExpr(vars_[amom_.id(axis_id,time_id)]) - LinExpr(vars_[amom_.id(axis_id,time_id-1)]))*(1.0/dynamicsSequence().dynamicsState(time_id).time()));
-            }
+            }*/
             if(axis_id != 2)
             {
             /*  if (time_id==0) {
@@ -198,7 +204,8 @@ namespace momentumopt {
 
         quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[0], (LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(ZMP_lx)));
         quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[1], (LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(ZMP_ly)));
-
+        file1 << ZMP_lx << " "<<ZMP_ly << std::endl;
+        
         for (int axis_id = 0; axis_id < 3; axis_id++)
         {
           if (time_id==0) {
@@ -214,7 +221,8 @@ namespace momentumopt {
       model_.setObjective(quad_objective_, 0.0);
       bool zmp_bool = true;
       bool zmp_double = false;
-
+      std::fstream file;
+      file.open("/home/jhk/ssd_mount/zmp.txt",std::ios_base::out);
       // center of mass above endeffector positions, ZMP constraint
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         if(dynamicsSequence().dynamicsState(time_id).endeffectorActivation(0) == true && dynamicsSequence().dynamicsState(time_id).endeffectorActivation(1) == true)
@@ -230,8 +238,8 @@ namespace momentumopt {
         {
           if(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
           {
-           // std::cout << "time 0.2  : " << time_id << std::endl;
-           /* if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
+            std::cout << "time 0.2  : " << time_id << std::endl;
+            /*if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
             {
               ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id) + this->contactLocation(time_id, 1, 0) * time_id)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
               ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id) + this->contactLocation(time_id, 1, 0) * time_id)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
@@ -274,27 +282,28 @@ namespace momentumopt {
                     ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
                   }
                 }
-              }
+              } 
             }
             zmp_bool = true;
           }
           else if(1.2/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
           {
            // std::cout << "time 1.2  : " << time_id << std::endl;
-            int time_id_ = time_id - (1.0/this->getSetting().get(PlannerDoubleParam_TimeStep) - 1);
+            int time_id_ = time_id - (0.8/this->getSetting().get(PlannerDoubleParam_TimeStep) - 1);
+            //std::cout << "time_id_ " << time_id_ << std::endl;
             if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
             {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
             }
             else
             {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
             }
           }
           else
@@ -361,38 +370,36 @@ namespace momentumopt {
             }
           }
         }
+
+        file << ZMP_lx << " "<< ZMP_ux << " "<<ZMP_ly << " " << ZMP_uy << std::endl;
+        //std::cout << ZMP_lx << " "<< ZMP_ux << " "<<ZMP_ly << " " << ZMP_uy << std::endl;
+        //std::cout << this->getSetting().get(PlannerDoubleParam_RobotMass) << " "<<(dynamicsSequence().dynamicsState(time_id).time())<< std::endl;
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(ZMP_lx), ">", 0.0);//see temp
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(ZMP_ux), "<", 0.0);
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(ZMP_ly), ">", 0.0);//see temp
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(ZMP_uy), "<", 0.0);
         if(time_id == 0)
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[0]))-LinExpr(ini_state_.ZMP()[0])+LinExpr(vars_[amomd_.id(1,time_id)])/76.19282014079963;
+          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[0])-LinExpr(ini_state_.ZMP()[0]))-LinExpr(vars_[amomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         else
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(0,time_id-1)])-LinExpr(vars_[ZMP_.id(0,time_id-1)]))+LinExpr(vars_[amomd_.id(1,time_id)])/76.19282014079963;
+          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(0,time_id-1)])-LinExpr(vars_[ZMP_.id(0,time_id-1)]))-LinExpr(vars_[amomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         model_.addLinConstr(lin_cons_, "=", 0.0);
         if(time_id == 0)
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[1]))-LinExpr(ini_state_.ZMP()[1])+LinExpr(vars_[amomd_.id(0,time_id)])/76.19282014079963;
+          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[1])-LinExpr(ini_state_.ZMP()[1]))+LinExpr(vars_[amomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         else
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(1,time_id-1)])-LinExpr(vars_[ZMP_.id(1,time_id-1)]))-LinExpr(vars_[amomd_.id(0,time_id)])/76.19282014079963;
+          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(1,time_id-1)])-LinExpr(vars_[ZMP_.id(1,time_id-1)]))+LinExpr(vars_[amomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         model_.addLinConstr(lin_cons_, "=", 0.0);
       }
 
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) 
       {
-        for (int axis_id=0; axis_id<2; axis_id++) {
-          if (time_id==0) { lin_cons_ = LinExpr(vars_[com_.id(axis_id,time_id)]) - LinExpr(ini_state_.centerOfMass()[axis_id]) - LinExpr(ini_state_.linearMomentum()[axis_id])*(dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass)); }
-          else            { lin_cons_ = LinExpr(vars_[com_.id(axis_id,time_id)]) - LinExpr(vars_[com_.id(axis_id,time_id-1)])  - LinExpr(vars_[lmom_.id(axis_id,time_id-1)])*(dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass)); }
-          model_.addLinConstr(lin_cons_, "=", 0.0);
-        }
-
         for (int axis_id=0; axis_id<2; axis_id++) {
           if (time_id==0) { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]) - LinExpr(ini_state_.ZMP()[axis_id]) - LinExpr(vars_[ZMPd_.id(axis_id,time_id)])*dynamicsSequence().dynamicsState(time_id).time();}
           else            { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]) - LinExpr(vars_[ZMP_.id(axis_id,time_id-1)])  - LinExpr(vars_[ZMPd_.id(axis_id,time_id)])*(dynamicsSequence().dynamicsState(time_id).time()); }
@@ -410,6 +417,12 @@ namespace momentumopt {
         for (int axis_id=0; axis_id<2; axis_id++) {
           if (time_id==0) { lin_cons_ = LinExpr(vars_[amom_.id(axis_id,time_id)]) - LinExpr(ini_state_.angularMomentum()[axis_id]) - LinExpr(vars_[amomd_.id(axis_id,time_id)])*dynamicsSequence().dynamicsState(time_id).time(); }
           else            { lin_cons_ = LinExpr(vars_[amom_.id(axis_id,time_id)]) - LinExpr(vars_[amom_.id(axis_id,time_id-1)])    - LinExpr(vars_[amomd_.id(axis_id,time_id)])*dynamicsSequence().dynamicsState(time_id).time(); }
+          model_.addLinConstr(lin_cons_, "=", 0.0);
+        }
+
+        for (int axis_id=0; axis_id<2; axis_id++) {
+          if (time_id==0) { lin_cons_ = LinExpr(vars_[com_.id(axis_id,time_id)]) - LinExpr(ini_state_.centerOfMass()[axis_id]) - LinExpr(vars_[lmom_.id(axis_id,time_id)])*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass); }
+          else            { lin_cons_ = LinExpr(vars_[com_.id(axis_id,time_id)]) - LinExpr(vars_[com_.id(axis_id,time_id-1)])  - LinExpr(vars_[lmom_.id(axis_id,time_id)])*dynamicsSequence().dynamicsState(time_id).time()/this->getSetting().get(PlannerDoubleParam_RobotMass); }
           model_.addLinConstr(lin_cons_, "=", 0.0);
         }
 
@@ -518,20 +531,29 @@ namespace momentumopt {
         dynamicsSequence().dynamicsState(time_id+1).endeffectorCoP(0) = Eigen::Vector2d(mat_guess_.block<2,1>(0,time_id));
         dynamicsSequence().dynamicsState(time_id+1).ZMP() = Eigen::Vector2d(mat_guess_.block<2,1>(0,time_id));
       } 
-    std::cout << "ZMPsol0" <<  Eigen::Vector2d(mat_guess_.block<2,1>(0,0))<<std::endl;
     ZMPd_.getGuessValue(mat_guess_);
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++)
       {
         dynamicsSequence().dynamicsState(time_id).ZMPd() = Eigen::Vector2d(mat_guess_.block<2,1>(0,time_id));
       } 
-    for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps)+1; time_id++)
+    for (int time_id=1; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps)+1; time_id++)
     {
-       // std::cout << time_id << std::endl;
-       // std::cout << dynamicsSequence().dynamicsState(time_id).centerOfMass().transpose() << std::endl;
-       // std::cout << dynamicsSequence().dynamicsState(time_id).linearMomentum().transpose()/95.941282 << std::endl;
-      //double x = dynamicsSequence().dynamicsState(time_id).linearMomentumRate()(0)/95.941282 -  12.3526*(dynamicsSequence().dynamicsState(time_id).centerOfMass()(0)-dynamicsSequence().dynamicsState(time_id).ZMP()(0)) + dynamicsSequence().dynamicsState(time_id).angularMomentumRate()(1)/76.19282014079963;
-      //double y = dynamicsSequence().dynamicsState(time_id).linearMomentumRate()(1)/95.941282 -  12.3526*(dynamicsSequence().dynamicsState(time_id).centerOfMass()(1)-dynamicsSequence().dynamicsState(time_id).ZMP()(1)) - dynamicsSequence().dynamicsState(time_id).angularMomentumRate()(0)/76.19282014079963;
-      //std::cout <<"x " << x <<"y " << y << std::endl;
+      /* 
+      std::cout << time_id << std::endl;
+      std::cout << dynamicsSequence().dynamicsState(time_id).centerOfMass().transpose()  <<std::endl;
+      std::cout << dynamicsSequence().dynamicsState(time_id).centerOfMass().transpose() - dynamicsSequence().dynamicsState(time_id-1).centerOfMass().transpose()  - dynamicsSequence().dynamicsState(time_id-1).linearMomentum().transpose()/95.941282 *0.010 <<std::endl;
+      std::cout << dynamicsSequence().dynamicsState(time_id-1).centerOfMass().transpose()  <<std::endl;
+      
+      std::cout << dynamicsSequence().dynamicsState(time_id-1).linearMomentum().transpose()/95.941282 << "   " << dynamicsSequence().dynamicsState(time_id).time() <<" " << this->getSetting().get(PlannerDoubleParam_RobotMass)<< std::endl;
+      std::cout << dynamicsSequence().dynamicsState(time_id).linearMomentumRate().transpose()/95.941282 << std::endl;
+      /*double x = dynamicsSequence().dynamicsState(time_id).linearMomentumRate()(0)/95.941282 -  12.3526*(dynamicsSequence().dynamicsState(time_id-1).centerOfMass()(0)-dynamicsSequence().dynamicsState(time_id-1).ZMP()(0)) + dynamicsSequence().dynamicsState(time_id).angularMomentumRate()(1)/76.19282014079963;
+      double y = dynamicsSequence().dynamicsState(time_id).linearMomentumRate()(1)/95.941282 -  12.3526*(dynamicsSequence().dynamicsState(time_id-1).centerOfMass()(1)-dynamicsSequence().dynamicsState(time_id-1).ZMP()(1)) - dynamicsSequence().dynamicsState(time_id).angularMomentumRate()(0)/76.19282014079963;
+      std::cout <<"x " << x <<"y " << y << std::endl;
+      x = dynamicsSequence().dynamicsState(time_id-1).linearMomentum()(0)/95.941282 * 0.010 + dynamicsSequence().dynamicsState(time_id-1).centerOfMass()(0) - dynamicsSequence().dynamicsState(time_id).centerOfMass()(0);
+
+      y = dynamicsSequence().dynamicsState(time_id-1).linearMomentum()(1)/95.941282 * 0.010 + dynamicsSequence().dynamicsState(time_id-1).centerOfMass()(1) - dynamicsSequence().dynamicsState(time_id).centerOfMass()(1);
+      std::cout <<"x_ " << x <<"y_ " << y << std::endl;
+     */
     }
   }
 
