@@ -72,7 +72,7 @@ namespace momentumopt {
     contact_plan_ = contact_plan;
     weight_desired_com_tracking_.setZero();
     //com_pos_goal_ = ini_state_.centerOfMass() + this->getSetting().get(PlannerVectorParam_CenterOfMassMotion);
-    com_pos_goal_<< 1.861938268e-01, 5.18219890e-06, ini_state_.centerOfMass()(2);
+    com_pos_goal_<< 0.386193826, 5.18219890e-06, ini_state_.centerOfMass()(2);
     contact_plan_->fillDynamicsSequence(ini_state, this->dynamicsSequence());
     this->initializeOptimizationVariables();
 
@@ -172,7 +172,7 @@ namespace momentumopt {
 
         bool ZMP_l = false;
         bool ZMP_r = false; 
-
+      
         for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
           if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
             if(eff_id == 0)
@@ -202,9 +202,13 @@ namespace momentumopt {
           ZMP_ly = this->contactLocation(time_id, 1, 1);
         }
 
+        //ZMP_lx = (ZMP_lx + ZMP_ux)/2;
+        //ZMP_ly = (ZMP_ly + ZMP_uy)/2;
+
         quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[0], (LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(ZMP_lx)));
         quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[1], (LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(ZMP_ly)));
         file1 << ZMP_lx << " "<<ZMP_ly << std::endl;
+                
         
         for (int axis_id = 0; axis_id < 3; axis_id++)
         {
@@ -234,58 +238,26 @@ namespace momentumopt {
           zmp_double = false;
         }
 
-        if(zmp_double == true)
-        {
-          if(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
+        /*if(zmp_double == true && 0.2/this->getSetting().get(PlannerDoubleParam_TimeStep)<time_id && 0.4/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
+        { 
+          int time_id_ = time_id - 0.2/this->getSetting().get(PlannerDoubleParam_TimeStep);
+          if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
           {
-            std::cout << "time 0.2  : " << time_id << std::endl;
-            /*if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
-            {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id) + this->contactLocation(time_id, 1, 0) * time_id)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id) + this->contactLocation(time_id, 1, 0) * time_id)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id) + this->contactLocation(time_id, 1, 1) * time_id)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id) + this->contactLocation(time_id, 1, 1) * time_id)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-            }
-            else
-            {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id + this->contactLocation(time_id, 1, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id + this->contactLocation(time_id, 1, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id + this->contactLocation(time_id, 1, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id + this->contactLocation(time_id, 1, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
-            }*/
-            for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
-              if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
-                if(zmp_bool == true)
-                {
-                  ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] + this->contactLocation(time_id, eff_id, 0);
-                  ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1] + this->contactLocation(time_id, eff_id, 0);
-                  ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2] + this->contactLocation(time_id, eff_id, 1);
-                  ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
-                  zmp_bool = false;
-                }
-                else
-                {
-                  if(ZMP_lx - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] - this->contactLocation(time_id, eff_id, 0) > 0)
-                  {
-                    ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] + this->contactLocation(time_id, eff_id, 0);
-                  }
-                  if(ZMP_ux - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1]-this->contactLocation(time_id, eff_id, 0) < 0)
-                  {
-                    ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1] + this->contactLocation(time_id, eff_id, 0);
-                  }
-                  if(ZMP_ly - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2]-this->contactLocation(time_id, eff_id, 1) > 0)
-                  {
-                    ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2] + this->contactLocation(time_id, eff_id, 1);
-                  }
-                  if(ZMP_uy - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] -this->contactLocation(time_id, eff_id, 1)< 0)
-                  {
-                    ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
-                  }
-                }
-              } 
-            }
-            zmp_bool = true;
+            ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
           }
+          else
+          {
+            ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.8/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.8/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.8/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.8/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.8/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.8/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.8/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.8/this->getSetting().get(PlannerDoubleParam_TimeStep));
+          }
+            zmp_bool = true;
+
+          /*
           else if(1.2/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
           {
            // std::cout << "time 1.2  : " << time_id << std::endl;
@@ -306,25 +278,28 @@ namespace momentumopt {
               ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
             }
           }
-          else
+          else if(2.0/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
           {
-            //std::cout << "time 1.2af  : " << time_id << std::endl;
-           /* int time_id_ = time_id - (2.0/this->getSetting().get(PlannerDoubleParam_TimeStep) - 1);
-            if(this->contactLocation(time_id,0,0) > this->contactLocation(time_id,1,0))
+           // std::cout << "time 1.2  : " << time_id << std::endl;
+            int time_id_ = time_id - (1.8/this->getSetting().get(PlannerDoubleParam_TimeStep) - 1);
+            std::cout << "time_id_ " << time_id_ << std::endl;
+            if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
             {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
             }
             else
             {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
-            }*/
-
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.2/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.2/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+          }
+          else
+          {
             for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
               if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
                 if(zmp_bool == true)
@@ -357,18 +332,118 @@ namespace momentumopt {
               }
             }
             zmp_bool = true;
-          }
+          }*/
+        //}
+        if(zmp_double == true && 1.0/this->getSetting().get(PlannerDoubleParam_TimeStep)<=time_id + 1 && 1.4/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
+        {
+          int time_id_ = time_id - 1.0/this->getSetting().get(PlannerDoubleParam_TimeStep) + 1;
+          if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
+            {
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+            else
+            {
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+        }
+        else if(zmp_double == true && 2.0/this->getSetting().get(PlannerDoubleParam_TimeStep)<=time_id + 1 && 2.4/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
+        {
+          int time_id_ = time_id - 2.0/this->getSetting().get(PlannerDoubleParam_TimeStep) + 1;
+          if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
+            {
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+            else
+            {
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+        }
+        else if(zmp_double == true && 3.0/this->getSetting().get(PlannerDoubleParam_TimeStep)<=time_id + 1 && 3.4/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
+        {
+          int time_id_ = time_id - 3.0/this->getSetting().get(PlannerDoubleParam_TimeStep) + 1;
+          if(this->contactLocation(time_id,0,0) < this->contactLocation(time_id,1,0))
+            {
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 0) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_) + this->contactLocation(time_id, 1, 1) * time_id_)/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+            else
+            {
+              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][0] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][1] + (this->contactLocation(time_id, 0, 0) * time_id_ + this->contactLocation(time_id, 1, 0)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][2] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[0][3] + (this->contactLocation(time_id, 0, 1) * time_id_ + this->contactLocation(time_id, 1, 1)  * ((0.4/this->getSetting().get(PlannerDoubleParam_TimeStep))-time_id_))/(0.4/this->getSetting().get(PlannerDoubleParam_TimeStep));
+            }
+        }
+        else if(zmp_double == true && 0.2/this->getSetting().get(PlannerDoubleParam_TimeStep)>time_id)
+        {
+          for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
+              if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
+                  if(ZMP_lx - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] - this->contactLocation(time_id, eff_id, 0) > 0)
+                  {
+                    ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] + this->contactLocation(time_id, eff_id, 0);
+                  }
+                  if(ZMP_ux - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1]-this->contactLocation(time_id, eff_id, 0) < 0)
+                  {
+                    ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1] + this->contactLocation(time_id, eff_id, 0);
+                  }
+                  if(ZMP_ly - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2]-this->contactLocation(time_id, eff_id, 1) > 0)
+                  {
+                    ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2] + this->contactLocation(time_id, eff_id, 1);
+                  }
+                  if(ZMP_uy - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] -this->contactLocation(time_id, eff_id, 1)< 0)
+                  {
+                    ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
+                  }
+                }
+              }
         }
         else
         {
           for (int eff_id=0; eff_id<this->getSetting().get(PlannerIntParam_NumActiveEndeffectors); eff_id++) {
-            if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
-              ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] + this->contactLocation(time_id, eff_id, 0);
-              ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1] + this->contactLocation(time_id, eff_id, 0);
-              ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2] + this->contactLocation(time_id, eff_id, 1);
-              ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
+              if (dynamicsSequence().dynamicsState(time_id).endeffectorActivation(eff_id)) {
+                if(zmp_double == false)
+                {
+                  ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] + this->contactLocation(time_id, eff_id, 0);
+                  ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1] + this->contactLocation(time_id, eff_id, 0);
+                  ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2] + this->contactLocation(time_id, eff_id, 1);
+                  ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
+                  zmp_bool = false;
+                }
+                else
+                {
+                  if(ZMP_lx - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] - this->contactLocation(time_id, eff_id, 0) > 0)
+                  {
+                    ZMP_lx = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][0] + this->contactLocation(time_id, eff_id, 0);
+                  }
+                  if(ZMP_ux - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1]-this->contactLocation(time_id, eff_id, 0) < 0)
+                  {
+                    ZMP_ux = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][1] + this->contactLocation(time_id, eff_id, 0);
+                  }
+                  if(ZMP_ly - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2]-this->contactLocation(time_id, eff_id, 1) > 0)
+                  {
+                    ZMP_ly = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][2] + this->contactLocation(time_id, eff_id, 1);
+                  }
+                  if(ZMP_uy - this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] -this->contactLocation(time_id, eff_id, 1)< 0)
+                  {
+                    ZMP_uy = this->getSetting().get(PlannerArrayParam_CenterOfPressureRange)[eff_id][3] + this->contactLocation(time_id, eff_id, 1);
+                  }
+                }
+              }
             }
-          }
         }
 
         file << ZMP_lx << " "<< ZMP_ux << " "<<ZMP_ly << " " << ZMP_uy << std::endl;
@@ -378,22 +453,25 @@ namespace momentumopt {
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(ZMP_ux), "<", 0.0);
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(ZMP_ly), ">", 0.0);//see temp
         model_.addLinConstr(LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(ZMP_uy), "<", 0.0);
+
+
+
         if(time_id == 0)
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[0])-LinExpr(ini_state_.ZMP()[0]))-LinExpr(vars_[amomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
+          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[0])-LinExpr(ini_state_.ZMP()[0]))+LinExpr(vars_[amomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         else
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(0,time_id-1)])-LinExpr(vars_[ZMP_.id(0,time_id-1)]))-LinExpr(vars_[amomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
+          lin_cons_ = LinExpr(vars_[lmomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(0,time_id-1)])-LinExpr(vars_[ZMP_.id(0,time_id-1)]))+LinExpr(vars_[amomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         model_.addLinConstr(lin_cons_, "=", 0.0);
         if(time_id == 0)
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[1])-LinExpr(ini_state_.ZMP()[1]))+LinExpr(vars_[amomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
+          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(ini_state_.centerOfMass()[1])-LinExpr(ini_state_.ZMP()[1]))-LinExpr(vars_[amomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         else
         {
-          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(1,time_id-1)])-LinExpr(vars_[ZMP_.id(1,time_id-1)]))+LinExpr(vars_[amomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
+          lin_cons_ = LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - 12.3526*(LinExpr(vars_[com_.id(1,time_id-1)])-LinExpr(vars_[ZMP_.id(1,time_id-1)]))-LinExpr(vars_[amomd_.id(0,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass);
         }
         model_.addLinConstr(lin_cons_, "=", 0.0);
       }
@@ -538,6 +616,8 @@ namespace momentumopt {
       } 
     for (int time_id=1; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps)+1; time_id++)
     {
+      //std::cout << time_id << std::endl;
+      //std::cout << dynamicsSequence().dynamicsState(time_id+1).centerOfMass().transpose() << "  " << std::endl;
       /* 
       std::cout << time_id << std::endl;
       std::cout << dynamicsSequence().dynamicsState(time_id).centerOfMass().transpose()  <<std::endl;

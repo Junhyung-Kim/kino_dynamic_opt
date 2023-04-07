@@ -78,17 +78,23 @@ class MotionPlanner():
         self.with_lqr = with_lqr
         self.kd_iter1 = 0
 
-    def init_from_settings(self, i=0, j=0):
+    def init_from_settings(self, i=0, j=0, k=0, l=0):
         self.kin_optimizer.robot.modelUpdateinit()
-        PELV_move = [-0.01*(i), 0.008*(j-9.5), 0.0]
+        PELV_move = [0.01*(i), 0.01*(j-4.5), 0.0]
         PELV_ori_move = [0.0, 0.0, 0.0]
         PELVd_move = [0.0, 0.0, 0.0]
-        zmp_move = [0, 0]
+        zmp_move = [0.01*(k-4.5), 0.01*(l-4.5)]
         PELVd_ori_move = [0.0, 0.0, 0.0]
         print("i")
         print(i)
         print("j")
         print(j)
+
+        print("k")
+        print(k)
+
+        print("l")
+        print(l)
 
         print(self.kin_optimizer.robot.PELV_tran)
         self.kin_optimizer.robot.PELV_tran = self.kin_optimizer.robot.PELV_tran + PELV_move
@@ -112,21 +118,21 @@ class MotionPlanner():
         qinit_ = copy(qinit)
         qdot[0:3] = PELVd_move
         qdot[3:6] = PELVd_ori_move
-        qinit_ = se3.integrate(self.kin_optimizer.robot.model, qinit_, qdot*0.010)
+        qinit_ = se3.integrate(self.kin_optimizer.robot.model, qinit_, qdot*0.020)
         
         self.kin_optimizer.robot.PELV_rot = se3.utils.XYZQUATToSe3(qinit_[0:7]).rotation
 
         for i in range(0,3):
-            self.kin_optimizer.robot.PELV_tran[i] = self.kin_optimizer.robot.PELV_tran[i] + PELVd_move[i] * 0.010
+            self.kin_optimizer.robot.PELV_tran[i] = self.kin_optimizer.robot.PELV_tran[i] + PELVd_move[i] * 0.020
         
         self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
         
-        qdot[6:] = (self.kin_optimizer.robot.leg_q - leg_q)/0.010
+        qdot[6:] = (self.kin_optimizer.robot.leg_q - leg_q)/0.020
 
         self.kin_optimizer.q_init = qinit
         self.kin_optimizer.dq_init = qdot
 
-        qinit = se3.integrate(self.kin_optimizer.robot.model, qinit, qdot*0.010)
+        qinit = se3.integrate(self.kin_optimizer.robot.model, qinit, qdot*0.020)
         
         self.kin_optimizer.robot.modelUpdate(qinit, qdot)
         zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1]]

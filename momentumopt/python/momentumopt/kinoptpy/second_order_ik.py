@@ -210,8 +210,8 @@ class SecondOrderInverseKinematics(object):
         dq_kin = np.zeros([num_time_steps,dq_init.shape[0]])
         ddq_kin = np.zeros_like(dq_kin)
 
-        inner_steps = int(dt/0.010)
-        inner_dt = 0.010
+        inner_steps = int(dt/0.020)
+        inner_dt = 0.020
         time = np.linspace(0., (num_time_steps-1)*dt, num_time_steps)
         splined_com_ref = CubicSpline(time, com_ref)
         splined_lmom_ref = CubicSpline(time, lmom_ref)

@@ -350,6 +350,7 @@ class BipedTocabiWrapper(BasicRobotWrapper):
         initial_configuration = np.array(
             [0, 0, 0.82473, 0, 0, 0, 1, 0, 0, -0.55, 1.26, -0.71, 0, 0, 0, -0.55, 1.26, -0.71, 0]
         )        
+
         self.q = initial_configuration
         self.qinit = initial_configuration
         if not q is None:
