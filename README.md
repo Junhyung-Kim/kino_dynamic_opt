@@ -64,6 +64,7 @@ For example plan and execute a jumping motion with
 python3 ../nodes/kino_dyn_planner -i ../config/cfg_solo8_jump.yaml
 python3 ../nodes/kino_dyn_planner -i ../config/cfg_solo12_jump.yaml --solo12
 python3 ../nodes/kino_dyn_planner -i ../config/cfg_bolt_jump.yaml --bolt
+python3 ../nodes/kino_dyn_planner -i ../config/cfg_tocabi_walk.yaml --walk
 ```
 
 #### Configuration overview
@@ -78,6 +79,7 @@ The available motions are:
 * cfg_solo8_jump.yaml
 * cfg_solo8_fast_short_trot.yaml
 * cfg_solo8_trot.yaml
+* cfg_tocabi_walk.yaml
 
 For an explanation of the different settings in the configuration files, refer to [cfg_solo_jump.yaml].
 
@@ -87,31 +89,3 @@ which one you would like to use. The default version is a first order inverse ki
 that optimizes for generalized velocities. If you wanna use second order inverse
 kinematics, you would need to change the boolean `use_second_order_inv_kin` to `True`
 in your config (.yaml) file.
-
-## Experimental Section
-```
-#### Configuration overview
-The available motions are:
-* Lifting rear legs: cfg_demo01_twofeet.yaml
-
-## Saving .dat file for dynamic graph
-
-Executing
-```
-python3 ../nodes/kino_dyn_planner -i <path_to_config_file>
-```
-automatically saves the `quadruped_positions.dat` and the `quadruped_velocities.dat` files in the `<work_folder>/kino-dynamic-opt/src/catkin/motion_planning/momentumopt/demos` directory. These files can then be supplied to dynamic graph and for example executed on the real robot.
-
-## License
-
-Copyright (c) 2019, New York University and Max Planck Gesellschaft.
-
-## Authors
-
-- Brahayam Ponton (<bponton@tue.mpg.de>) (1)
-- Majid Khadiv (<mkhadiv@tuebingen.mpg.de>) (1)
-- Julian Viereck (<jviereck@tuebingen.mpg.de>) (1)
-- Avadesh Meduri (<am9789@nyu.edu>) (1-2)
-
-(1): Max Planck Institute for Intelligent System, Tubingen, Germany \
-(2): New York University, New York, USA
