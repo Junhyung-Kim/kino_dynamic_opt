@@ -87,13 +87,7 @@ class SecondOrderInverseKinematics(object):
         
         # com part
         self.desired_acceleration[:3] += self.p_com_tracking * (com_ref - self.robot.com(q))
-        print("com")
-        print(com_ref)
-        print(self.robot.com(q))
-
-        print(mom_ref)
-        print(self.robot.data.hg)
-
+        
         self.desired_acceleration[5] = 0.0
         
         #self.desired_acceleration[2] += *(self.p_com_tracking * (com_ref - self.robot.com(q)))[2]
@@ -111,17 +105,11 @@ class SecondOrderInverseKinematics(object):
         LForient_error = pin.log3(Lfoot_orien.T @ orien_ref.matrix())
 
         # desired motion of the feet
-        print("feet")
         for i, idx in enumerate(self.endeff_ids):
             self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] = self.p_endeff_tracking * (endeff_pos_ref[i] - self.robot.data.oMf[idx].translation)
             self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] += self.d_endeff_tracking * (endeff_vel_ref[i] - measured_op_space_velocities[6 + 3*i: 6 + 3*(i + 1)])
             self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] += endeff_acc_ref[i]
-            print(endeff_pos_ref[i])
-            print(self.robot.data.oMf[idx].translation)
-            print(endeff_vel_ref[i])
-        print("base")
-        print(base_orien.T)
-   
+        
         self.desired_acceleration[6 + 6*0 + 3: 6 + 6*0 + 6] = (self.p_orientf_tracking * RForient_error - self.d_orientf_tracking * measured_op_space_velocities[6 + 6*0 + 3: 6 + 6*0 + 6]) 
         self.desired_acceleration[6 + 6*1 + 3: 6 + 6*1 + 6] = (self.p_orientf_tracking * LForient_error - self.d_orientf_tracking * measured_op_space_velocities[6 + 6*1 + 3: 6 + 6*1 + 6]) 
         
@@ -287,7 +275,6 @@ class SecondOrderInverseKinematics(object):
                 if result == 2:
                     print(it)
                     print("Sss")
-                    k = dsfs
                     break
                 # Integrate to the next state.
                 dq += ddq * inner_dt

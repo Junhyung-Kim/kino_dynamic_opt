@@ -62,7 +62,7 @@ def parse_arguments(argv):
 
     return cfg_file, RobotWrapper, with_lqr
 
-def build_optimization(cfg_file, RobotWrapper, with_lqr, i, j, k, l, l1, H2):
+def build_optimization(cfg_file, RobotWrapper, with_lqr, i, j, k, l, l1, j5, H2):
     """
     Build the optimization problem
     """
@@ -71,7 +71,7 @@ def build_optimization(cfg_file, RobotWrapper, with_lqr, i, j, k, l, l1, H2):
     motion_planner = MotionPlanner(cfg_file, MomentumKinematicsOptimizer, RobotWrapper, with_lqr)
 
     # load all the parameters of the planner
-    motion_planner.init_from_settings(i, j, k, l, l1, H2)
+    motion_planner.init_from_settings(i, j, k, l, l1, j5, H2)
 
     return motion_planner
 
@@ -91,10 +91,10 @@ def optimize_motion(motion_planner, plot_com_motion=False):
            dynamics_feedback, planner_setting, time_vector, result
 
 
-def build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, i, j, k, l, l1, H2, plot_com_motion=False):
+def build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, i, j, k, l, l1, j1, H2, plot_com_motion=False):
     """ Build the optimization problem and solve it in one go."""
 
-    motion_planner = build_optimization(cfg_file, RobotWrapper, with_lqr,  i, j, k, l, l1, H2)
+    motion_planner = build_optimization(cfg_file, RobotWrapper, with_lqr,  i, j, k, l, l1, j1, H2)
     optimized_kin_plan, optimized_motion_eff, optimized_dyn_plan, \
       dynamics_feedback, planner_setting, time_vector, result = \
           optimize_motion(motion_planner, plot_com_motion)
@@ -127,115 +127,119 @@ def main(argv):
     crocs_data1['Right']['acc_trajs'] = []        
     crocs_data1['Right']['u_trajs'] = []
     boole = False
-    JJJJ = 0
+    JJJJ = 0 #25개
     for i1 in range(JJJJ,JJJJ+1):
-        for j1 in range(0,1):
-            for j2 in range(0,1):
-                for j3 in range(0,1):
-                    for j4 in range(0,1):
-                        # 이번에는 4
-                        if j1 == 0 and j2 == 0 and j3 == 0 and j4 == 0:
-                            boole  = True
+        for j1 in range(0,5):#5):
+            for j2 in range(0,5):#5):
+                for j3 in range(0,5):#5):
+                    for j4 in range(0,5):#4): #speed
+                        for j5 in range(0,3):#5):
+                            # 이번에는 4
+                            if j1 == 0 and j2 == 0 and j3 == 0 and j4 == 0 and j5 == 0:
+                                boole  = True
         
-                        if j1 == 6 and j2 == 0 and j3 == 0 and j4 == 0:
-                            boole = False
+                            if j1 == 2 and j2 == 0 and j3 == 0 and j4 == 0 and j5 == 0:
+                                boole = False
 
-                        H2 = -0.0007
-                        H3 = '_0'
-                        #k = asdfsfa
-                        '''
-                        if i1 == 6 and j1 == 0 and j2 == 1 and j3 == 0 and j4 == 3:
-                            boole= True
-                        if i1 == 6 and j1 == 0 and j2 == 2 and j3 == 0 and j4 == 1:
-                            boole= False
-                        '''
-                    
-                        if boole == True:# and j4 != 4 and j4 != 5:
-                            # Compute the motion
-                            (motion_planner, optimized_kin_plan,
-                            optimized_motion_eff,
-                            optimized_dyn_plan,
-                            dynamics_feedback,
-                            planner_setting,
-                            time_vector, result) = build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, i1, j1, j2, j3, j4, H2)
+                            H2 = 0.0006 # 0.0003 0.0006 -0.0003 
+                            if(j1<2):
+                                H3 = '_0'
+                            else:
+                                H3 = '_5'
+                            #k = asdfsfa
+                            '''
+                            if i1 == 6 and j1 == 0 and j2 == 1 and j3 == 0 and j4 == 3:
+                                boole= True
+                            if i1 == 6 and j1 == 0 and j2 == 2 and j3 == 0 and j4 == 1:
+                                boole= False
+                            '''
+                        
+                            if boole == True:# and j4 != 4 and j4 != 5:
+                                # Compute the motion
+                                (motion_planner, optimized_kin_plan,
+                                optimized_motion_eff,
+                                optimized_dyn_plan,
+                                dynamics_feedback,
+                                planner_setting,
+                                time_vector, result) = build_and_optimize_motion(cfg_file, RobotWrapper, with_lqr, i1, j1, j2, j3, j4, j5,  H2)
 
-                            # The default visualizer is Meshcat, if you wanna use geppeto_viewer
-                            # pass viz="gepetto" as an argument.
-                            print("re")
-                            print(result)
-                            if result != 2:
-                                
-                                #motion_planner.replay_kinematics(viz="gepetto")           
-                                state_q = []
-                                state_qd = []
-                                state_x = []
-                                state_xkin = []
-                                state_u = []
-                                state_ud = []
-                                state_udkin = []
+                                # The default visualizer is Meshcat, if you wanna use geppeto_viewer
+                                # pass viz="gepetto" as an argument.
+                                print("re")
+                                print(result)
+                                if result != 2:
+                                    
+                                    #motion_planner.replay_kinematics(viz="gepetto")           
+                                    state_q = []
+                                    state_qd = []
+                                    state_x = []
+                                    state_xkin = []
+                                    state_u = []
+                                    state_ud = []
+                                    state_udkin = []
 
-                                for i in range(0, len(optimized_dyn_plan.dynamics_states)):
-                                    state_q.append(optimized_kin_plan.kinematics_states[i].robot_posture.generalized_joint_positions)
-                                    state_qd.append(optimized_kin_plan.kinematics_states[i].robot_velocity.generalized_joint_velocities)
-                                    state_x.append([optimized_dyn_plan.dynamics_states[i].com[0], optimized_dyn_plan.dynamics_states[i].lmom[0]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[0], optimized_dyn_plan.dynamics_states[i].amom[1],
-                                                    optimized_dyn_plan.dynamics_states[i].com[1], optimized_dyn_plan.dynamics_states[i].lmom[1]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[1], optimized_dyn_plan.dynamics_states[i].amom[0],
-                                                    optimized_dyn_plan.dynamics_states[i].com[2], optimized_dyn_plan.dynamics_states[i].lmom[2]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[2]])
-                                    state_xkin.append([optimized_kin_plan.kinematics_states[i].com[0], optimized_kin_plan.kinematics_states[i].lmom[0]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[0], optimized_kin_plan.kinematics_states[i].amom[1],
-                                                    optimized_kin_plan.kinematics_states[i].com[1], optimized_kin_plan.kinematics_states[i].lmom[1]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[1], optimized_kin_plan.kinematics_states[i].amom[0],
-                                                    optimized_kin_plan.kinematics_states[i].com[2], optimized_kin_plan.kinematics_states[i].lmom[2]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[2]])
-                                
-                                    print(i)
-                                    k = optimized_dyn_plan.dynamics_states[i].lmomd[0]/95.941282 -(9.81+optimized_dyn_plan.dynamics_states[i].lmomd[2]/95.941282)/(optimized_dyn_plan.dynamics_states[i].com[2]-optimized_dyn_plan.dynamics_states[i].zmp[2])*(optimized_dyn_plan.dynamics_states[i].com[0]-optimized_dyn_plan.dynamics_states[i].zmp[0] - optimized_dyn_plan.dynamics_states[i].amomd[1]/(95.941282*(9.81+optimized_dyn_plan.dynamics_states[i].lmomd[2]/95.941282)))
-                                    print(k)
-                                
-                                '''
-                                for i in range(0, len(optimized_dyn_plan.dynamics_states)-1):    
-                                    state_ud.append([optimized_dyn_plan.dynamics_states[i].zmpd[0], optimized_dyn_plan.dynamics_states[i].amomd[1], optimized_dyn_plan.dynamics_states[i].zmpd[1], optimized_dyn_plan.dynamics_states[i].amomd[0]]) #, optimized_dyn_plan.dynamics_states[i].lmomd[0]/95.941282,optimized_dyn_plan.dynamics_states[i].lmomd[1]/95.941282])
-                                    state_udkin.append([optimized_dyn_plan.dynamics_states[i].zmpd[0], optimized_dyn_plan.dynamics_states[i].amomd[1], optimized_dyn_plan.dynamics_states[i].zmpd[1], optimized_dyn_plan.dynamics_states[i].amomd[0]])
-                                    state_u.append(optimized_kin_plan.kinematics_states[i].robot_acceleration.generalized_joint_accelerations)
-                                '''
-                                crocs_data['Right']['trajs'].append(copy(state_q))
-                                crocs_data['Right']['vel_trajs'].append(copy(state_qd))
-                                #crocs_data['Right']['u_trajs'].append(copy(state_u))
-                                #crocs_data['Right']['acc_trajs'].append(copy(state_ud))
-                                crocs_data['Right']['x_state'].append(copy(state_x))
-                                #crocs_data['Right']['x_inputs'].append(copy([i1, j1, j2, j3, j4]))
+                                    for i in range(0, len(optimized_dyn_plan.dynamics_states)):
+                                        state_q.append(optimized_kin_plan.kinematics_states[i].robot_posture.generalized_joint_positions)
+                                        state_qd.append(optimized_kin_plan.kinematics_states[i].robot_velocity.generalized_joint_velocities)
+                                        state_x.append([optimized_dyn_plan.dynamics_states[i].com[0], optimized_dyn_plan.dynamics_states[i].lmom[0]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[0], optimized_dyn_plan.dynamics_states[i].amom[1],
+                                                        optimized_dyn_plan.dynamics_states[i].com[1], optimized_dyn_plan.dynamics_states[i].lmom[1]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[1], optimized_dyn_plan.dynamics_states[i].amom[0],
+                                                        optimized_dyn_plan.dynamics_states[i].com[2], optimized_dyn_plan.dynamics_states[i].lmom[2]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[2]])
+                                        state_xkin.append([optimized_kin_plan.kinematics_states[i].com[0], optimized_kin_plan.kinematics_states[i].lmom[0]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[0], optimized_kin_plan.kinematics_states[i].amom[1],
+                                                        optimized_kin_plan.kinematics_states[i].com[1], optimized_kin_plan.kinematics_states[i].lmom[1]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[1], optimized_kin_plan.kinematics_states[i].amom[0],
+                                                        optimized_kin_plan.kinematics_states[i].com[2], optimized_kin_plan.kinematics_states[i].lmom[2]/95.941282, optimized_dyn_plan.dynamics_states[i].zmp[2]])
+                                    
+                                        print(i)
+                                        k = optimized_dyn_plan.dynamics_states[i].lmomd[0]/95.941282 -(9.81+optimized_dyn_plan.dynamics_states[i].lmomd[2]/95.941282)/(optimized_dyn_plan.dynamics_states[i].com[2]-optimized_dyn_plan.dynamics_states[i].zmp[2])*(optimized_dyn_plan.dynamics_states[i].com[0]-optimized_dyn_plan.dynamics_states[i].zmp[0] - optimized_dyn_plan.dynamics_states[i].amomd[1]/(95.941282*(9.81+optimized_dyn_plan.dynamics_states[i].lmomd[2]/95.941282)))
+                                        print(k)
+                                    
+                                    '''
+                                    for i in range(0, len(optimized_dyn_plan.dynamics_states)-1):    
+                                        state_ud.append([optimized_dyn_plan.dynamics_states[i].zmpd[0], optimized_dyn_plan.dynamics_states[i].amomd[1], optimized_dyn_plan.dynamics_states[i].zmpd[1], optimized_dyn_plan.dynamics_states[i].amomd[0]]) #, optimized_dyn_plan.dynamics_states[i].lmomd[0]/95.941282,optimized_dyn_plan.dynamics_states[i].lmomd[1]/95.941282])
+                                        state_udkin.append([optimized_dyn_plan.dynamics_states[i].zmpd[0], optimized_dyn_plan.dynamics_states[i].amomd[1], optimized_dyn_plan.dynamics_states[i].zmpd[1], optimized_dyn_plan.dynamics_states[i].amomd[0]])
+                                        state_u.append(optimized_kin_plan.kinematics_states[i].robot_acceleration.generalized_joint_accelerations)
+                                    '''
+                                    crocs_data['Right']['trajs'].append(copy(state_q))
+                                    crocs_data['Right']['vel_trajs'].append(copy(state_qd))
+                                    #crocs_data['Right']['u_trajs'].append(copy(state_u))
+                                    #crocs_data['Right']['acc_trajs'].append(copy(state_ud))
+                                    crocs_data['Right']['x_state'].append(copy(state_x))
+                                    #crocs_data['Right']['x_inputs'].append(copy([i1, j1, j2, j3, j4]))
 
-                                crocs_data1['Right']['trajs'].append(copy(state_q))
-                                crocs_data1['Right']['vel_trajs'].append(copy(state_qd))
-                                crocs_data1['Right']['u_trajs'].append(copy(state_u))
-                                crocs_data1['Right']['x_state'].append(copy(state_xkin))
-                                crocs_data1['Right']['acc_trajs'].append(copy(state_udkin))
-                                crocs_data1['Right']['x_inputs'].append(copy([i1, j1, j2, j3, j4]))
+                                    crocs_data1['Right']['trajs'].append(copy(state_q))
+                                    crocs_data1['Right']['vel_trajs'].append(copy(state_qd))
+                                    crocs_data1['Right']['u_trajs'].append(copy(state_u))
+                                    crocs_data1['Right']['x_state'].append(copy(state_xkin))
+                                    crocs_data1['Right']['acc_trajs'].append(copy(state_udkin))
+                                    crocs_data1['Right']['x_inputs'].append(copy([i1, j1, j2, j3, j4]))
 
-                                # Dump the computed trajectory in a files (should follow the dynamic graph formast)
-                                #motion_planner.save_files()
-                                #d = asdfasdfafasd
-                                
-                                H1 = '/home/jhk/walkingdata1/'
-                                G = H1 + str(i1) + '_' + str(H2) + H3 + '.txt'
-                                with open(G,'wb') as f:
-                                    pickle.dump(crocs_data,f)
-                                for ss in range(0, 10):
-                                    print(ss, "ss")
-                                    if ss >= 1:
-                                        print(optimized_dyn_plan.dynamics_states[ss].lmomd[0]/95.941282 - (9.81+optimized_dyn_plan.dynamics_states[ss].lmomd[2]/95.941282)/(optimized_dyn_plan.dynamics_states[ss].com[2]-optimized_dyn_plan.dynamics_states[ss].zmp[2])*(optimized_dyn_plan.dynamics_states[ss].com[0]-optimized_dyn_plan.dynamics_states[ss].zmp[0]-optimized_dyn_plan.dynamics_states[ss].amomd[1]/(95.941282*(9.81+optimized_dyn_plan.dynamics_states[ss].lmomd[2]/95.941282))))
-                                    print(state_q[ss][0:3])
-                                    print(state_x[ss])
-                                    print(state_xkin[ss])
-                                #print(state_x)
-                                    #print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss][0] + 0.02 * crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][1]-crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][0])
-                                    #print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss][4] + 0.02 * crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][5]-crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][4])
-                                '''
-                                for ss in range(0, 5):
-                                    print(ss)
-                                    print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss])
-                                print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][59])
-                                '''
+                                    # Dump the computed trajectory in a files (should follow the dynamic graph formast)
+                                    #motion_planner.save_files()
+                                    #d = asdfasdfafasd
+                                    
+                                    H1 = '/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/'
+                                    G = H1 + str(i1) + '_' + str(H2) + H3 + '.txt'
+                                    with open(G,'wb') as f:
+                                        pickle.dump(crocs_data,f)
+                                    for ss in range(0, 10):
+                                        print(ss, "ss")
+                                        if ss >= 1:
+                                            print(optimized_dyn_plan.dynamics_states[ss].lmomd[0]/95.941282 - (9.81+optimized_dyn_plan.dynamics_states[ss].lmomd[2]/95.941282)/(optimized_dyn_plan.dynamics_states[ss].com[2]-optimized_dyn_plan.dynamics_states[ss].zmp[2])*(optimized_dyn_plan.dynamics_states[ss].com[0]-optimized_dyn_plan.dynamics_states[ss].zmp[0]-optimized_dyn_plan.dynamics_states[ss].amomd[1]/(95.941282*(9.81+optimized_dyn_plan.dynamics_states[ss].lmomd[2]/95.941282))))
+                                        print(state_q[ss][0:3])
+                                        print(state_x[ss])
+                                        print(state_xkin[ss])
+                                    #print(state_x)
+                                        #print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss][0] + 0.02 * crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][1]-crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][0])
+                                        #print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss][4] + 0.02 * crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][5]-crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss+1][4])
+                                    '''
+                                    for ss in range(0, 5):
+                                        print(ss)
+                                        print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][ss])
+                                    print(crocs_data['Right']['x_state'][len(crocs_data['Right']['x_state'])-1][59])
+                                    '''
     print("result")
     print(result)  
     #a = finish
-    #k = sfds
+    k = sfds
     # Display the motion
     display = True
     if(display): # plot trajectories

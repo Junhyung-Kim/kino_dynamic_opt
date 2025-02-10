@@ -288,7 +288,7 @@ class EndeffectorTrajectoryGenerator(object):
         num_step1 = 0
         print(eff_traj_poly)
         print(eff_traj_poly1)#0.1025
-        print("traject")
+        
         for it in range(num_time_steps):
             for eff, name in enumerate(mom_kin_optimizer.eff_names):
                 if eff == 1:
@@ -422,8 +422,8 @@ class EndeffectorTrajectoryGenerator(object):
                     endeff_pos_ref1[eff][i][2] = 0.0
 
         
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/lfoot1.txt", endeff_pos_ref1[0])
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/rfoot1.txt", endeff_pos_ref1[1])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/lfoot1.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/rfoot1.txt", endeff_pos_ref1[1])
         
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 

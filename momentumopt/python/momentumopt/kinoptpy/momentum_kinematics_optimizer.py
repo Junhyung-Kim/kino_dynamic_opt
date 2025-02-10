@@ -288,7 +288,7 @@ class EndeffectorTrajectoryGenerator(object):
         num_step1 = 0
         print(eff_traj_poly)
         print(eff_traj_poly1)#0.1025
-        print("traject")
+        
         for it in range(num_time_steps):
             for eff, name in enumerate(mom_kin_optimizer.eff_names):
                 if eff == 1:
@@ -429,10 +429,10 @@ class EndeffectorTrajectoryGenerator(object):
         print(endeff_vel_ref)
         k = ss
         '''
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/lfoot1.txt", endeff_pos_ref1[0])
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/rfoot1.txt", endeff_pos_ref1[1])
-        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/vel.txt", endeff_vel_ref)
-        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/rfoot1_vel.txt", endeff_vel_ref1[1])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/lfoot1.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/rfoot1.txt", endeff_pos_ref1[1])
+        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/vel.txt", endeff_vel_ref)
+        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/rfoot1_vel.txt", endeff_vel_ref1[1])
         
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 
@@ -701,7 +701,6 @@ class MomentumKinematicsOptimizer(object):
                 for it, (q, dq, ddq) in enumerate(zip(q_kin, dq_kin, ddq_kin)):
                     self.inv_kin.forward_robot(q, dq)
                     self.fill_kinematic_result(it, q, dq, ddq) 
-                    print(q)
                     #k = fsd
                     #print(self.q_kin[it])
                     #print("dq")

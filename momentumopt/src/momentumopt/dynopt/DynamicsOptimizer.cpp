@@ -79,6 +79,8 @@ namespace momentumopt {
     com_pos_goal_(1) = com_pos_goal_(1) + timey * 0.205/50;
     com_pos_goal_(2) = com_pos_goal_(2);
     std::cout << "com_pos_goal" << com_pos_goal_.transpose() << std::endl;
+
+    std::cout << "lmom" << ini_state_.linearMomentum().transpose() << std::endl;
     
     contact_plan_->fillDynamicsSequence(ini_state, this->dynamicsSequence());
     this->initializeOptimizationVariables();
@@ -130,7 +132,7 @@ namespace momentumopt {
 
       double ZMP_ux, ZMP_lx, ZMP_uy, ZMP_ly;
       std::fstream file1;
-      file1.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/timestep0_zmp3_ssp1_1.txt",std::ios_base::out);    
+      file1.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/timestep0_zmp3_ssp1_1.txt",std::ios_base::out);    
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         for (int axis_id=0; axis_id<3; axis_id++) {
           // penalty on center of mass, linear and angular momentum with Kinematics
@@ -206,7 +208,7 @@ namespace momentumopt {
       bool zmp_bool = true;
       bool zmp_double = false;
       std::fstream file;
-      file.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=0/timestep0_zmp2_ssp1_1.txt",std::ios_base::out);
+      file.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=2/timestep0_zmp2_ssp1_1.txt",std::ios_base::out);
       // center of mass above endeffector positions, ZMP constraint
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         if(dynamicsSequence().dynamicsState(time_id).endeffectorActivation(0) == true && dynamicsSequence().dynamicsState(time_id).endeffectorActivation(1) == true)
@@ -390,7 +392,7 @@ namespace momentumopt {
           comz = dynamicsSequence().dynamicsState(time_id).centerOfMass()[2];
           zmpy = dynamicsSequence().dynamicsState(time_id).ZMP()[1];
           angx = dynamicsSequence().dynamicsState(time_id).angularMomentumRate()[0];
-          
+
           w_1 = (9.81+comddz)/(comz-zmpz);
           w_2 = -zmpy + comy + angx/(this->getSetting().get(PlannerDoubleParam_RobotMass) *(9.81+comddz));
           lin_cons_ +=  (LinExpr(vars_[lmomd_.id(1,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass)) - comddy - w_1 * (LinExpr(vars_[com_.id(1,time_id)]) - comy) + w_1 *(LinExpr(vars_[ZMP_.id(1,time_id)]) - zmpy) - w_1*w_2 - (comy - zmpy)/(comz-zmpz) * (LinExpr(vars_[lmomd_.id(2,time_id)])/this->getSetting().get(PlannerDoubleParam_RobotMass) - comddz) - (LinExpr(vars_[amomd_.id(0,time_id)]) - angx)/(this->getSetting().get(PlannerDoubleParam_RobotMass) *(comz - zmpz));
@@ -564,7 +566,7 @@ namespace momentumopt {
       } 
     for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps)+1; time_id++)
     {
-      std::cout << time_id << std::endl;
+      /*std::cout << time_id << std::endl;
       std::cout << dynamicsSequence().dynamicsState(time_id).centerOfMass().transpose() <<std::endl;
       std::cout << dynamicsSequence().dynamicsState(time_id).linearMomentumRate().transpose() << std::endl;
       double  comddz, comz, zmpz, comx, zmpx, angy;
@@ -580,7 +582,9 @@ namespace momentumopt {
       a += 1/(comz-zmpz)*(comx-zmpx-angy/(this->getSetting().get(PlannerDoubleParam_RobotMass) * (9.81+comddz))) *(dynamicsSequence().dynamicsState(time_id).linearMomentumRate()(2)/this->getSetting().get(PlannerDoubleParam_RobotMass) - dynamicsSequence().dynamicsState(time_id-1).linearMomentumRate()(2)/this->getSetting().get(PlannerDoubleParam_RobotMass));
       a += -(9.81 + comddz)/((comz-zmpz)*(comz-zmpz))*(comx-zmpx-angy/(this->getSetting().get(PlannerDoubleParam_RobotMass) * (9.81+comddz)))*(dynamicsSequence().dynamicsState(time_id).centerOfMass()(2) - dynamicsSequence().dynamicsState(time_id-1).centerOfMass()(0) - (dynamicsSequence().dynamicsState(time_id).ZMP()(2) - dynamicsSequence().dynamicsState(time_id-1).ZMP()(2)));
       
-      std::cout << a << std::endl;
+      std::cout << a << std::endl;*/
+
+      
       //std::cout << time_id << std::endl;
       //std::cout << dynamicsSequence().dynamicsState(time_id+1).centerOfMass().transpose() << "  " << std::endl;
       /* 

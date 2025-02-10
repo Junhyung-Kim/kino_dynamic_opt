@@ -78,35 +78,16 @@ class MotionPlanner():
         self.with_lqr = with_lqr
         self.kd_iter1 = 0
 
-    def init_from_settings(self, i=0, j=0, k=0, l=0, l1 = 0, H2=0):
+    def init_from_settings(self, i=0, j=0, k=0, l=0, l1 = 0, j2 = 0, H2=0):
         self.kin_optimizer.robot.modelUpdateinit()      
         time = 0
         timex = 0
-        #22, 21
-        '''
-        if i > 5:
-            PELV_move = [-0.01*(i-5)+ timex * 0.1/50, 0.01*(j-2.5) - time * 0.205/50, 0.0]
-        else:
-            PELV_move = [0.009*(i)+ timex * 0.1/50, 0.01*(j-2.5) - time * 0.205/50, 0.0]
+        PELV_move = [-0.015*(i-2)+ timex * 0.1/50, 0.015*(j-2) - time * 0.205/50, 0.013 * (j2 - 2.5)]
         PELV_ori_move = [0.0, 0.0, 0.0]
-        PELVd_move = [0.001 * (l1-2.3), H2, 0.0] #2.0 timestep=7까지
-        if PELVd_move[1] > 0:
-            PELVd_move[1] = PELVd_move[1]/1.1
-        if PELVd_move[1] < 0:
-            PELVd_move[1] = PELVd_move[1]/0.9 #have to revise
-        #if i >= 4 and i<6:
-        #    zmp_move = [0.01*(k-3.0), 0.01*(l-2.5)]
-        #else:
-        zmp_move = [0.01*(k-2.5), 0.008*(l-3.0)]
+        PELVd_move = [0.0007 + 0.0008 * (l1-2), H2, -0.001] #2.0 timestep=7까지
+        zmp_move = [0.015*(k-2), 0.015*(l-2), 0]
         PELVd_ori_move = [0.0, 0.0, 0.0]
-        '''
-        
-        PELV_move = [0, 0, 0]
-        PELV_ori_move = [0, 0, 0]
-        zmp_move = [0, 0]
-        PELVd_move = [0, 0, 0]
-        PELVd_ori_move = [0, 0, 0]
-        
+
         print("i")
         print(i)
         print("j")
@@ -118,8 +99,10 @@ class MotionPlanner():
         print(l)
         print("l1")
         print(l1)
+        print("j2")
+        print(j2)
         print(H2)
-        print("timestep=0")
+        print("timestep=2")
         print(PELVd_move)
         print("LF_tran")
         print(self.kin_optimizer.robot.LF_tran)
@@ -162,6 +145,7 @@ class MotionPlanner():
         self.kin_optimizer.robot.RF_tran = np.sum([RF_temp_prev,[-0.03, 0.0, 0.15842]], axis = 0)
         self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
         
+        
         qdot[6:] = (leg_q - self.kin_optimizer.robot.leg_q)/0.020
         print("qdot")
         print(qdot)
@@ -170,7 +154,7 @@ class MotionPlanner():
 
         self.kin_optimizer.robot.modelUpdate(qinit, qdot)
         zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1], 0]
-        for i in range(0,2):
+        for i in range(0,3):
             zmp[i] = zmp[i] + zmp_move[i]
         
         self.ini_state.com = self.kin_optimizer.robot.data.com[0]
@@ -180,10 +164,13 @@ class MotionPlanner():
         self.kin_optimizer.ini_state = self.ini_state
         print("cm")
         print(self.ini_state.com)
+        print(self.kin_optimizer.robot.data.vcom[0])
+        print(qdot)
+        print("zmp")
         print(self.ini_state.zmp)
         print(qinit)
         print(self.kin_optimizer.robot.leg_q)
-
+        #k = fs
         kin_optimizer = self.kin_optimizer
         inv_kin = kin_optimizer.inv_kin
         snd_order_inv_kin = kin_optimizer.snd_order_inv_kin
