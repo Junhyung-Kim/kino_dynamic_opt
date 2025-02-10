@@ -3,7 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/pysolver.dir/srcpy/solver/PySolver.cpp.o.d"
   "CMakeFiles/pysolver.dir/srcpy/solver/interface/PySetting.cpp.o"
   "CMakeFiles/pysolver.dir/srcpy/solver/interface/PySetting.cpp.o.d"
-  "pysolver.cpython-36m-x86_64-linux-gnu.so"
+  "pysolver.cpython-38-x86_64-linux-gnu.so"
   "pysolver.pdb"
 )
 

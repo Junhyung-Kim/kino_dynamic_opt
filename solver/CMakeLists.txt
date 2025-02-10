@@ -116,8 +116,8 @@ pybind11_add_module(pysolver MODULE srcpy/solver/PySolver.cpp
 target_link_libraries(pysolver PRIVATE pybind11::module)
 target_link_libraries(pysolver PRIVATE solver)
 
-set(${python_install_dir} '/usr/local/lib/python3.6')
-install(TARGETS pysolver LIBRARY DESTINATION /usr/local/lib/python3.6/dist-packages)
+set(${python_install_dir} '/usr/local/lib/python3.8')
+install(TARGETS pysolver LIBRARY DESTINATION /usr/local/lib/python3.8/dist-packages)
 
 #
 # Tests

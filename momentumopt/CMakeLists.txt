@@ -133,8 +133,8 @@ target_link_libraries(pymomentum PRIVATE momentumopt)
 
 # install the bindings
 #get_python_install_dir(python_install_dir)
-set(${python_install_dir} '/usr/local/lib/python3.6')
-install(TARGETS pymomentum DESTINATION '/usr/local/lib/python3.6/dist-packages')
+set(${python_install_dir} '/usr/local/lib/python3.8')
+install(TARGETS pymomentum DESTINATION python3.8/dist-packages)
 
 # install the python package too
 install(

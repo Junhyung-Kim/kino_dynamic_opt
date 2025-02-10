@@ -61,7 +61,7 @@ class QpSolver():
         qp_a = -q
         if A is not None and G is None:
             meq = A.shape[0]
-            return solve_qp(qp_G, qp_a, -A.T, -b, meq)[0]
+            return solve_qp(qp_G, qp_a, -A.T, -b, meq)[0], solve_qp(qp_G, qp_a, qp_C, qp_b, meq)[-1]
         elif G is not None:
             if A is not None:
                 qp_C = -vstack([A, G]).T
@@ -73,10 +73,10 @@ class QpSolver():
                 qp_b = -h
                 meq = 0
                 # print("NO EQUALITY CONSTRAINT")
-            return solve_qp(qp_G, qp_a, qp_C, qp_b, meq)[0]
+            return solve_qp(qp_G, qp_a, qp_C, qp_b, meq)[0], solve_qp(qp_G, qp_a, qp_C, qp_b, meq)[-1]
         else:
             # print("UNCONSTRAINED OPTIMIZATION")
-            return solve_qp(qp_G, qp_a)[0]
+            return solve_qp(qp_G, qp_a)[0], solve_qp(qp_G, qp_a)[-1]
 
     def cvxopt_solve_qp(self, P, q, G=None, h=None, A=None, b=None):
         # P = .5 * (P + P.T)  # make sure P is symmetric

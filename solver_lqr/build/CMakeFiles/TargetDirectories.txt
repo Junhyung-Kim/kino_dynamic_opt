@@ -29,11 +29,6 @@
 /home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/ContinuousCoverage.dir
 /home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/ContinuousMemCheck.dir
 /home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/ContinuousSubmit.dir
-/home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/solver_lqr_sphinx_doxygen.dir
-/home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/solver_lqr_breathe_apidoc.dir
-/home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/solver_lqr_readme_symlink.dir
-/home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/solver_lqr_license_symlink.dir
-/home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/solver_lqr_sphinx_html.dir
 /home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/test.dir
 /home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/edit_cache.dir
 /home/jhk/kino_dynamic_opt/solver_lqr/build/CMakeFiles/rebuild_cache.dir

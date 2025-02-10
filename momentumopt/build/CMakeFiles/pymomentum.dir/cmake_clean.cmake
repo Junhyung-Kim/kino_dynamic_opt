@@ -13,7 +13,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/pymomentum.dir/srcpy/momentumopt/setting/PyParams.cpp.o.d"
   "CMakeFiles/pymomentum.dir/srcpy/momentumopt/setting/PySetting.cpp.o"
   "CMakeFiles/pymomentum.dir/srcpy/momentumopt/setting/PySetting.cpp.o.d"
-  "pymomentum.cpython-36m-x86_64-linux-gnu.so"
+  "pymomentum.cpython-38-x86_64-linux-gnu.so"
   "pymomentum.pdb"
 )
 

@@ -17,8 +17,12 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/jhk/kino_dynamic_opt/solver_lqr/src/solver_lqr/SolverLqrSetting.cpp" "CMakeFiles/solver_lqr.dir/src/solver_lqr/SolverLqrSetting.cpp.o" "gcc" "CMakeFiles/solver_lqr.dir/src/solver_lqr/SolverLqrSetting.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.

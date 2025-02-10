@@ -319,7 +319,8 @@ class MotionSimulator(object):
         planeId = p.loadURDF(os.path.join(urdf_base_string, "urdf", "plane_with_restitution.urdf"))
         cubeStartPos = [0, 0, floor_height]
         cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
-        print(urdf_robot_string)
+        
+        k=sf
         self.robotId = p.loadURDF(urdf_robot_string, cubeStartPos, cubeStartOrientation, flags=p.URDF_USE_INERTIA_FROM_FILE)
         cubePos, cubeOrn = p.getBasePositionAndOrientation(self.robotId)
 

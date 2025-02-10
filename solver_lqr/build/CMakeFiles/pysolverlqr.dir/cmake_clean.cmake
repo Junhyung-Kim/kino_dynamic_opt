@@ -9,7 +9,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/pysolverlqr.dir/srcpy/solver_lqr/PySettingLqr.cpp.o.d"
   "CMakeFiles/pysolverlqr.dir/srcpy/solver_lqr/PySolverLqr.cpp.o"
   "CMakeFiles/pysolverlqr.dir/srcpy/solver_lqr/PySolverLqr.cpp.o.d"
-  "pysolverlqr.cpython-36m-x86_64-linux-gnu.so"
+  "pysolverlqr.cpython-38-x86_64-linux-gnu.so"
   "pysolverlqr.pdb"
 )
 

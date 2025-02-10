@@ -27,6 +27,8 @@ class PointContactInverseKinematics(object):
         self.mass = sum([i.mass for i in self.robot.model.inertias[1:]])
         self.base_id = self.robot.model.getFrameId('base_link')
         self.endeff_frame_names = endeff_frame_names
+        for name in endeff_frame_names:
+            print(name)
         self.endeff_ids = [getFrameId(name) for name in endeff_frame_names]
         self.is_init_time=1
         self.ne = len(self.endeff_ids)

@@ -17,9 +17,12 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/jhk/kino_dynamic_opt/momentumopt/srcpy/momentumopt/setting/PySetting.cpp" "CMakeFiles/pymomentum.dir/srcpy/momentumopt/setting/PySetting.cpp.o" "gcc" "CMakeFiles/pymomentum.dir/srcpy/momentumopt/setting/PySetting.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt.dir/DependInfo.cmake"
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.

@@ -40,8 +40,8 @@ namespace momentumopt {
 	  Eigen::Vector3d& centerOfMass() { return com_; }
 	  Eigen::Vector3d& linearMomentum() { return lmom_; }
 	  Eigen::Vector3d& angularMomentum() { return amom_; }
-	  Eigen::Vector2d& ZMP() { return ZMP_; }
-    Eigen::Vector2d& ZMPd() { return ZMPd_; }
+	  Eigen::Vector3d& ZMP() { return ZMP_; }
+    Eigen::Vector3d& ZMPd() { return ZMPd_; }
 	  Eigen::Vector3d& linearMomentumRate() { return lmomd_; }
 	  Eigen::Vector3d& angularMomentumRate() { return amomd_; }
 
@@ -49,37 +49,37 @@ namespace momentumopt {
 	  const Eigen::Vector3d& centerOfMass() const { return com_; }
 	  const Eigen::Vector3d& linearMomentum() const { return lmom_; }
 	  const Eigen::Vector3d& angularMomentum() const { return amom_; }
-	  const Eigen::Vector2d& ZMP() const { return ZMP_; }
-	  const Eigen::Vector2d& ZMPd() const { return ZMPd_; }
+	  const Eigen::Vector3d& ZMP() const { return ZMP_; }
+	  const Eigen::Vector3d& ZMPd() const { return ZMPd_; }
 	  const Eigen::Vector3d& linearMomentumRate() const { return lmomd_; }
 	  const Eigen::Vector3d& angularMomentumRate() const { return amomd_; }
 
 	  void time(const double& dtime) { dtime_ = dtime; }
 	  void centerOfMass(const Eigen::Vector3d& com) { com_ = com; }
-    void ZMP(const Eigen::Vector2d& zmp) { ZMP_ = zmp; }
-    void ZMPd(const Eigen::Vector2d& zmpd) { ZMPd_ = zmpd; }
+    void ZMP(const Eigen::Vector3d& zmp) { ZMP_ = zmp; }
+    void ZMPd(const Eigen::Vector3d& zmpd) { ZMPd_ = zmpd; }
     void linearMomentum(const Eigen::Vector3d& lmom) { lmom_ = lmom; }
 	  void angularMomentum(const Eigen::Vector3d& amom) { amom_ = amom; }
 	  void linearMomentumRate(const Eigen::Vector3d& lmomd) { lmomd_ = lmomd; }
 	  void angularMomentumRate(const Eigen::Vector3d& amomd) { amomd_ = amomd; }
 
       // Endeffector forces, torques and cops
-      Eigen::Vector2d& endeffectorCoP(int eff_id) {return eff_cops_[eff_id];}
+      Eigen::Vector3d& endeffectorCoP(int eff_id) {return eff_cops_[eff_id];}
       Eigen::Vector3d& endeffectorForce(int eff_id) { return eff_forces_[eff_id]; }
       Eigen::Vector3d& endeffectorTorque(int eff_id) { return eff_torques_[eff_id]; }
       Eigen::Vector3d& endeffectorTorqueAtContactPoint(int eff_id) { return eefs_trqs_contact_point_[eff_id]; }
 
       long endeffectorNum() { return eff_cops_.size(); }
-      const Eigen::Vector2d& endeffectorCoP(int eff_id) const { return eff_cops_[eff_id]; }
+      const Eigen::Vector3d& endeffectorCoP(int eff_id) const { return eff_cops_[eff_id]; }
       const Eigen::Vector3d& endeffectorForce(int eff_id) const { return eff_forces_[eff_id]; }
       const Eigen::Vector3d& endeffectorTorque(int eff_id) const { return eff_torques_[eff_id]; }
       const Eigen::Vector3d& endeffectorTorqueAtContactPoint(int eff_id) const { return eefs_trqs_contact_point_[eff_id]; }
 
-      const std::vector<Eigen::Vector2d>& pyEndeffectorCops() const { return eff_cops_; }
+      const std::vector<Eigen::Vector3d>& pyEndeffectorCops() const { return eff_cops_; }
       const std::vector<Eigen::Vector3d>& pyEndeffectorForces() const { return eff_forces_; }
       const std::vector<Eigen::Vector3d>& pyEndeffectorTorques() const { return eff_torques_; }
 
-      void pyEndeffectorCops(const std::vector<Eigen::Vector2d>& eff_cops) { eff_cops_ = eff_cops; }
+      void pyEndeffectorCops(const std::vector<Eigen::Vector3d>& eff_cops) { eff_cops_ = eff_cops; }
       void pyEndeffectorForces(const std::vector<Eigen::Vector3d>& eff_forces) { eff_forces_ = eff_forces; }
       void pyEndeffectorTorques(const std::vector<Eigen::Vector3d>& eff_torques) { eff_torques_ = eff_torques; }
 
@@ -126,13 +126,13 @@ namespace momentumopt {
 	  
     private:
       double dtime_;
-      Eigen::Vector2d ZMP_, ZMPd_;
+      Eigen::Vector3d ZMP_, ZMPd_;
       Eigen::Vector3d com_, amom_, lmom_, amomd_, lmomd_;
       std::array<bool, Problem::n_endeffs_> eff_activations_;
       std::array<int, Problem::n_endeffs_> eff_ids_, cnt_ids_;
 
       std::vector<Eigen::Quaternion<double>> eff_orientations_;
-      std::vector<Eigen::Vector2d> eff_cops_;
+      std::vector<Eigen::Vector3d> eff_cops_;
       std::vector<Eigen::Vector3d> eff_positions_, eff_velocities_, eff_accelerations_;
       std::vector<Eigen::Vector3d> eff_forces_, eff_torques_, eefs_trqs_contact_point_;
   };

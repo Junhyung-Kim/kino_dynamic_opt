@@ -18,7 +18,7 @@ namespace momentumopt {
       lmom_(Eigen::Vector3d::Zero()),
       amomd_(Eigen::Vector3d::Zero()),
       lmomd_(Eigen::Vector3d::Zero()),
-      ZMP_(Eigen::Vector2d::Zero())
+      ZMP_(Eigen::Vector3d::Zero())
   {
     eff_positions_.clear();
     eff_velocities_.clear();
@@ -31,7 +31,7 @@ namespace momentumopt {
       cnt_ids_[eff_id] = -1;
       eff_activations_[eff_id] = false;
 
-      eff_cops_.push_back(Eigen::Vector2d::Zero());
+      eff_cops_.push_back(Eigen::Vector3d::Zero());
       eff_forces_.push_back(Eigen::Vector3d::Zero());
       eff_torques_.push_back(Eigen::Vector3d::Zero());
       eefs_trqs_contact_point_.push_back(Eigen::Vector3d::Zero());

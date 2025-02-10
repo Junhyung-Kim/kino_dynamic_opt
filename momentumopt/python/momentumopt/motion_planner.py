@@ -78,13 +78,35 @@ class MotionPlanner():
         self.with_lqr = with_lqr
         self.kd_iter1 = 0
 
-    def init_from_settings(self, i=0, j=0, k=0, l=0):
-        self.kin_optimizer.robot.modelUpdateinit()
-        PELV_move = [0.01*(i), 0.01*(j-4.5), 0.0]
+    def init_from_settings(self, i=0, j=0, k=0, l=0, l1 = 0, H2=0):
+        self.kin_optimizer.robot.modelUpdateinit()      
+        time = 0
+        timex = 0
+        #22, 21
+        '''
+        if i > 5:
+            PELV_move = [-0.01*(i-5)+ timex * 0.1/50, 0.01*(j-2.5) - time * 0.205/50, 0.0]
+        else:
+            PELV_move = [0.009*(i)+ timex * 0.1/50, 0.01*(j-2.5) - time * 0.205/50, 0.0]
         PELV_ori_move = [0.0, 0.0, 0.0]
-        PELVd_move = [0.0, 0.0, 0.0]
-        zmp_move = [0.01*(k-4.5), 0.01*(l-4.5)]
+        PELVd_move = [0.001 * (l1-2.3), H2, 0.0] #2.0 timestep=7까지
+        if PELVd_move[1] > 0:
+            PELVd_move[1] = PELVd_move[1]/1.1
+        if PELVd_move[1] < 0:
+            PELVd_move[1] = PELVd_move[1]/0.9 #have to revise
+        #if i >= 4 and i<6:
+        #    zmp_move = [0.01*(k-3.0), 0.01*(l-2.5)]
+        #else:
+        zmp_move = [0.01*(k-2.5), 0.008*(l-3.0)]
         PELVd_ori_move = [0.0, 0.0, 0.0]
+        '''
+        
+        PELV_move = [0, 0, 0]
+        PELV_ori_move = [0, 0, 0]
+        zmp_move = [0, 0]
+        PELVd_move = [0, 0, 0]
+        PELVd_ori_move = [0, 0, 0]
+        
         print("i")
         print(i)
         print("j")
@@ -92,13 +114,21 @@ class MotionPlanner():
 
         print("k")
         print(k)
-
         print("l")
         print(l)
-
-        print(self.kin_optimizer.robot.PELV_tran)
+        print("l1")
+        print(l1)
+        print(H2)
+        print("timestep=0")
+        print(PELVd_move)
+        print("LF_tran")
+        print(self.kin_optimizer.robot.LF_tran)
+        #print(se3.__file__)
+        RF_temp = [-5.520129000000000008e-02, -1.024999999999999939e-01, 0.000000000000000000e+00]
+        RF_temp_prev = [-5.520129000000000008e-02, -1.024999999999999939e-01, 0.000000000000000000e+00]
+        
+        self.kin_optimizer.robot.RF_tran = np.sum([RF_temp,[-0.03, 0.0, 0.15842]], axis = 0)
         self.kin_optimizer.robot.PELV_tran = self.kin_optimizer.robot.PELV_tran + PELV_move
-        print(self.kin_optimizer.robot.PELV_tran)
         self.kin_optimizer.robot.PELVd_tran = PELVd_move
         self.kin_optimizer.robot.PELV_rot = se3.rpy.rpyToMatrix(PELV_ori_move[0],PELV_ori_move[1],PELV_ori_move[2])
         self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
@@ -108,7 +138,7 @@ class MotionPlanner():
         leg_q = se3.utils.zero(12)
         
         leg_q = self.kin_optimizer.robot.leg_q
-        print(leg_q)
+        
         qinit[0:3] = self.kin_optimizer.robot.qinit[0:3] + PELV_move
         qinit[3] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).x
         qinit[4] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).y
@@ -116,26 +146,30 @@ class MotionPlanner():
         qinit[6] = se3.Quaternion(self.kin_optimizer.robot.PELV_rot).w
         qinit[7:] = self.kin_optimizer.robot.leg_q
         qinit_ = copy(qinit)
-        qdot[0:3] = PELVd_move
-        qdot[3:6] = PELVd_ori_move
-        qinit_ = se3.integrate(self.kin_optimizer.robot.model, qinit_, qdot*0.020)
+
+        print(qinit)
+       
         
-        self.kin_optimizer.robot.PELV_rot = se3.utils.XYZQUATToSe3(qinit_[0:7]).rotation
+        qdot[0] = PELVd_move[0]/0.02
+        qdot[1] = PELVd_move[1]/0.02
+        qdot[2] = PELVd_move[2]/0.02
+        qdot[3:6] = PELVd_ori_move
+        
+        self.kin_optimizer.robot.PELV_rot = se3.XYZQUATToSE3(qinit_[0:7]).rotation
 
         for i in range(0,3):
-            self.kin_optimizer.robot.PELV_tran[i] = self.kin_optimizer.robot.PELV_tran[i] + PELVd_move[i] * 0.020
-        
+            self.kin_optimizer.robot.PELV_tran[i] = self.kin_optimizer.robot.PELV_tran[i] - PELVd_move[i]
+        self.kin_optimizer.robot.RF_tran = np.sum([RF_temp_prev,[-0.03, 0.0, 0.15842]], axis = 0)
         self.kin_optimizer.robot.inverseKinematics(0.0, self.kin_optimizer.robot.LF_rot, self.kin_optimizer.robot.RF_rot, self.kin_optimizer.robot.PELV_rot, self.kin_optimizer.robot.LF_tran, self.kin_optimizer.robot.RF_tran, self.kin_optimizer.robot.PELV_tran, self.kin_optimizer.robot.HRR_tran_init, self.kin_optimizer.robot.HLR_tran_init, self.kin_optimizer.robot.HRR_rot_init, self.kin_optimizer.robot.HLR_rot_init, self.kin_optimizer.robot.PELV_tran_init, self.kin_optimizer.robot.PELV_rot_init, self.kin_optimizer.robot.CPELV_tran_init)
         
-        qdot[6:] = (self.kin_optimizer.robot.leg_q - leg_q)/0.020
-
+        qdot[6:] = (leg_q - self.kin_optimizer.robot.leg_q)/0.020
+        print("qdot")
+        print(qdot)
         self.kin_optimizer.q_init = qinit
         self.kin_optimizer.dq_init = qdot
 
-        qinit = se3.integrate(self.kin_optimizer.robot.model, qinit, qdot*0.020)
-        
         self.kin_optimizer.robot.modelUpdate(qinit, qdot)
-        zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1]]
+        zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1], 0]
         for i in range(0,2):
             zmp[i] = zmp[i] + zmp_move[i]
         
@@ -144,21 +178,12 @@ class MotionPlanner():
         self.ini_state.amom = self.kin_optimizer.robot.hg.angular
         self.ini_state.zmp = zmp
         self.kin_optimizer.ini_state = self.ini_state
-        
+        print("cm")
+        print(self.ini_state.com)
+        print(self.ini_state.zmp)
+        print(qinit)
+        print(self.kin_optimizer.robot.leg_q)
 
-        #self.ini_state.amomd =
-        #self.ini_state.lmomd =
-
-        #self.ini_state.eff_positions_[0] =
-        #self.ini_state.eff_velocities_[0] =
-        #self.ini_state.eff_accelerations_[0] =
-        #self.ini_state.eff_orientations_[0] =
-        
-        
-        #self.planner_setting.set( , self.kin_optimizer.robot.data.com[0])
-        #self.qd_init =
-
-        #self.kin_optimizer.robot.inverseKinematics()
         kin_optimizer = self.kin_optimizer
         inv_kin = kin_optimizer.inv_kin
         snd_order_inv_kin = kin_optimizer.snd_order_inv_kin
@@ -212,31 +237,38 @@ class MotionPlanner():
     def optimize_dynamics(self, kd_iter):
         print("DynOpt", kd_iter)
         start = time.time()
+        '''
+        if(kd_iter == 0):
+            self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
+                                    self.kin_optimizer.kinematics_sequence, kd_iter > 0)
+            
+            self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
+                                    self.kin_optimizer.kinematics_sequence, kd_iter > 0)
+            
+            self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
+                                    self.kin_optimizer.kinematics_sequence, kd_iter > 0)
+        '''
         self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
                                     self.kin_optimizer.kinematics_sequence, kd_iter > 0)
+        '''
+        for i in range(0, 60):
+            print(i)
+            #print(self.dyn_optimizer.dynamicsSequence().dynamics_states[i].com[0])
+            k = self.dyn_optimizer.dynamicsSequence().dynamics_states[i].lmomd[0]/95.941282 -(9.81+self.dyn_optimizer.dynamicsSequence().dynamics_states[i].lmomd[2]/95.941282)/(self.dyn_optimizer.dynamicsSequence().dynamics_states[i].com[2]-self.dyn_optimizer.dynamicsSequence().dynamics_states[i].zmp[2])*(self.dyn_optimizer.dynamicsSequence().dynamics_states[i].com[0]-self.dyn_optimizer.dynamicsSequence().dynamics_states[i].zmp[0] - self.dyn_optimizer.dynamicsSequence().dynamics_states[i].amomd[1]/(95.941282*(9.81+self.dyn_optimizer.dynamicsSequence().dynamics_states[i].lmomd[2]/95.941282)))
+            print(k)
+        '''
         print("Dynopt - " , time.time() -start)
 
     def optimize_kinematics(self, kd_iter, plotting=False):
         print("KinOpt", kd_iter)
         start = time.time()
-        self.kin_optimizer.optimize(self.ini_state, self.contact_plan.contactSequence(),
+        result = self.kin_optimizer.optimize(self.ini_state, self.contact_plan.contactSequence(),
                                     self.dyn_optimizer.dynamicsSequence(), plotting=plotting)
+
         print("kinopt - ", time.time() - start)
+        return result
 
     def optimize_dynamics_feedback(self):
-        # 'define dynamics feedback controller'
-        # '''
-        # Access feedback gains using: dynamics_feedback.forceGain(time_id)
-        #                             [currentCOM  - desiredCoM ]
-        #   deltaForce = forceGain *  [currentLMOM - desiredLMOM]
-        #                             [currentAMOM - desiredAMOM]
-        #
-        #  Torque = PD(q,qdot) + J^T * (plannedForce + deltaForce)
-        #  Remember that plannedForce of dyn_optimizer is normalized by robot weight
-        #  (self.planner_setting.get(PlannerDoubleParam_RobotWeight)),
-        #  so you need to multiply it by that amount for it to work!
-        #  deltaForce comes already in the right units.
-        # '''
         self.dynamics_feedback = DynamicsFeedback()
         self.dynamics_feedback.initialize(self.dynlqr_setting, self.planner_setting)
         self.dynamics_feedback.optimize(self.ini_state, self.dyn_optimizer.dynamicsSequence())
@@ -246,7 +278,7 @@ class MotionPlanner():
             plt.show()
         else:
             plt.draw()
-            plt.pause(0.001)
+            plt.pause(0.002)
 
     def plot_centroidal(self):
         fig, axes = plt.subplots(3, 1, figsize=(6, 8), sharex=True)
@@ -381,16 +413,26 @@ class MotionPlanner():
             amom = np.vstack([s.amom for s in states])
             return com, lmom, amom
 
+        def states_to_vec1(states):
+            zmp = np.vstack([s.zmp for s in states])
+            print(zmp)
+            return zmp
+
         for i, (title, dyn, kin) in enumerate(zip(
             ['com', 'lmom', 'amom'],
             states_to_vec(dynamics_states),
             states_to_vec(kinematics_states))):
 
             axes[0, i].set_title(title)
-
             for j in range(3):
                 axes[j, i].plot(dyn[:, j], label='dynamic')
                 axes[j, i].plot(kin[:, j], label='kinematic')
+        
+        dyn = states_to_vec1(dynamics_states)
+        print(i)
+        print(dyn)
+        for j in range(3):
+            axes[j, 0].plot(dyn[:, j], label='dynamic1')
 
         [ax.grid(True) for ax in axes.reshape(-1)]
 
@@ -417,7 +459,7 @@ class MotionPlanner():
 
         self.with_lqr = False
         if self.with_lqr:
-            create_lqr_files(time_vector,
+            create_lqr_files(time_ector,
                              self.kin_optimizer.motion_eff,
                              self.kin_optimizer.kinematics_sequence,
                              self.dyn_optimizer.dynamicsSequence(),
@@ -447,7 +489,12 @@ class MotionPlanner():
         bool_iter = True
         kd_iter = 0
         for kd_iter in range(0, self.planner_setting.get(PlannerIntParam_KinDynIterations)):
-            self.optimize_kinematics(kd_iter + 1, plotting=False)
+            result = self.optimize_kinematics(kd_iter + 1, plotting=False)
+            
+            if result == 2:
+                
+                break
+            
             self.optimize_dynamics(kd_iter + 1)
             optimized_kin_plan = self.kin_optimizer.kinematics_sequence
             optimized_dyn_plan = self.dyn_optimizer.dynamicsSequence()
@@ -481,7 +528,7 @@ class MotionPlanner():
             self.optimize_dynamics_feedback()
         return optimized_kin_plan, kin_optimizer.motion_eff, \
                 optimized_dyn_plan, self.dynamics_feedback, \
-                self.planner_setting, time_vector
+                self.planner_setting, time_vector, result
 
     def save_files1(self, kd_iter):
         time_vector = create_time_vector(self.dyn_optimizer.dynamicsSequence())
@@ -496,3 +543,4 @@ class MotionPlanner():
                              self.planner_setting.get(PlannerDoubleParam_RobotWeight), kd_iter)
 
     
+

@@ -81,12 +81,21 @@ class SecondOrderInverseKinematics(object):
                         joint_regularization_ref):
 
         measured_op_space_velocities = self.J @ dq
-
+        
         # get the ref momentum acc
         self.desired_acceleration[:6] = dmom_ref + np.diag(self.p_mom_tracking) @ (mom_ref - self.robot.data.hg)
-
+        
         # com part
         self.desired_acceleration[:3] += self.p_com_tracking * (com_ref - self.robot.com(q))
+        print("com")
+        print(com_ref)
+        print(self.robot.com(q))
+
+        print(mom_ref)
+        print(self.robot.data.hg)
+
+        self.desired_acceleration[5] = 0.0
+        
         #self.desired_acceleration[2] += *(self.p_com_tracking * (com_ref - self.robot.com(q)))[2]
 
         # orientation part
@@ -95,20 +104,27 @@ class SecondOrderInverseKinematics(object):
         Lfoot_orien = self.robot.data.oMf[self.endeff_ids[1]].rotation
         
         orient_error = pin.log3(base_orien.T @ orien_ref.matrix()) # rotated in world
+  
         self.desired_acceleration[3:6] += (self.p_orient_tracking * orient_error -
             self.d_orient_tracking * dq[3:6])
         RForient_error = pin.log3(Rfoot_orien.T @ orien_ref.matrix()) 
         LForient_error = pin.log3(Lfoot_orien.T @ orien_ref.matrix())
 
         # desired motion of the feet
+        print("feet")
         for i, idx in enumerate(self.endeff_ids):
             self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] = self.p_endeff_tracking * (endeff_pos_ref[i] - self.robot.data.oMf[idx].translation)
-            self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] += self.d_endeff_tracking*(endeff_vel_ref[i] - measured_op_space_velocities[6 + 3*i: 6 + 3*(i + 1)])
+            self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] += self.d_endeff_tracking * (endeff_vel_ref[i] - measured_op_space_velocities[6 + 3*i: 6 + 3*(i + 1)])
             self.desired_acceleration[6 + 6*i: 6 + 6*(i) + 3] += endeff_acc_ref[i]
-
+            print(endeff_pos_ref[i])
+            print(self.robot.data.oMf[idx].translation)
+            print(endeff_vel_ref[i])
+        print("base")
+        print(base_orien.T)
+   
         self.desired_acceleration[6 + 6*0 + 3: 6 + 6*0 + 6] = (self.p_orientf_tracking * RForient_error - self.d_orientf_tracking * measured_op_space_velocities[6 + 6*0 + 3: 6 + 6*0 + 6]) 
         self.desired_acceleration[6 + 6*1 + 3: 6 + 6*1 + 6] = (self.p_orientf_tracking * LForient_error - self.d_orientf_tracking * measured_op_space_velocities[6 + 6*1 + 3: 6 + 6*1 + 6]) 
-
+        
         if joint_regularization_ref is None:
             self.desired_acceleration[(self.ne) * 6 + 6:] = zero(self.nv - 6)
         else:
@@ -116,7 +132,8 @@ class SecondOrderInverseKinematics(object):
             self.desired_acceleration[(self.ne) * 6 + 6:] = self.p_joint_regularization * (joint_regularization_ref - q[7:])
             # REVIEW(mkhadiv): I am not sure if the negative sign makes sense here!
             self.desired_acceleration[(self.ne) * 6 + 6:] += - self.d_joint_regularization * dq[6:]
-
+        
+        
     def fill_weights(self, endeff_contact):
         w = [self.w_lin_mom_tracking * np.ones(3), self.w_ang_mom_tracking * np.ones(3)]
         
@@ -128,7 +145,9 @@ class SecondOrderInverseKinematics(object):
                 w.append(self.w_endeff_tracking * np.ones(3))
                 w.append(self.w_endori_tracking * np.ones(3))
         w.append(self.w_joint_regularization * np.ones(self.nv - 6))
+
         self.w = np.diag(np.hstack(w))
+      
 
     def update_kinematics(self, q, dq):
         # Update the pinocchio model.
@@ -170,12 +189,11 @@ class SecondOrderInverseKinematics(object):
             endeff_vel_ref: [N_endeff x 3] Reference endeffectors velocity in global coordinates
         '''
         self.update_kinematics(q, dq)
-
         self.update_des_acc(q, dq, com_ref, orien_ref, mom_ref, dmom_ref,
                             endeff_pos_ref, endeff_vel_ref, endeff_acc_ref,
                             joint_regularization_ref)
         self.fill_weights(endeff_contact)
-
+        
         if self.use_hierarchy:
             J_feet = self.J[6:6+12, :]
             J_feet_pinv = scipy.linalg.pinv(J_feet, cond=0.00001)
@@ -212,6 +230,7 @@ class SecondOrderInverseKinematics(object):
 
         inner_steps = int(dt/0.020)
         inner_dt = 0.020
+
         time = np.linspace(0., (num_time_steps-1)*dt, num_time_steps)
         splined_com_ref = CubicSpline(time, com_ref)
         splined_lmom_ref = CubicSpline(time, lmom_ref)
@@ -226,7 +245,6 @@ class SecondOrderInverseKinematics(object):
         dq = dq_init.copy()
         self.update_kinematics(q, dq)
 
-        q_kin[0] = q
         dq_kin[0] = dq
         com_kin[0] = self.robot.com(q).T
         hg = self.robot.centroidalMomentum(q, dq)
@@ -239,26 +257,47 @@ class SecondOrderInverseKinematics(object):
         endeff_acc_ref = np.zeros([self.ne,3])
         t = 0.
         t = t + inner_dt
+
+        it = 0
+        q_kin[it] = q
+        dq_kin[it] = dq
+        com_kin[it] = self.robot.com(q).T
+        hg = self.robot.centroidalMomentum(q, dq)
+        lmom_kin[it] = hg.linear.T
+        amom_kin[it] = hg.angular.T
+        endeff_pos_kin[it] = self.framesPos(self.endeff_ids)
+        endeff_vel_kin[it] = (self.J[6:(self.ne + 2) * 3].dot(dq).T).reshape([self.ne,3])
+        Rfoot_orien = self.robot.data.oMf[self.endeff_ids[0]].rotation
+        Lfoot_orien = self.robot.data.oMf[self.endeff_ids[1]].rotation
+        
+        
         for it in range(1,num_time_steps):
             for inner in range(inner_steps):
+                
                 dmom_ref = np.hstack((splined_lmom_ref(t, nu=1),
                                    splined_amom_ref(t, nu=1)))
-                
                 endeff_acc_ref = splined_endeff_vel_ref(t, nu=1)
                 orien_ref = pin.Quaternion(pin.rpy.rpyToMatrix(splined_base_ori_ref(t)))
-                ddq = self.step(
+                
+                ddq, result = self.step(
                         q, dq, splined_com_ref(t), orien_ref,
                         np.hstack((splined_lmom_ref(t), splined_amom_ref(t))), dmom_ref,
                         splined_endeff_pos_ref(t), splined_endeff_vel_ref(t), endeff_acc_ref,
                         endeff_contact[it], splined_joint_pos_ref(t))
-                
+                if result == 2:
+                    print(it)
+                    print("Sss")
+                    k = dsfs
+                    break
                 # Integrate to the next state.
                 dq += ddq * inner_dt
                 q = pin.integrate(self.robot.model, q, dq * inner_dt)
                 t += inner_dt
-                
+            
                 self.update_kinematics(q, dq)
-
+                
+            if result == 2:
+                break
             q_kin[it] = q
             dq_kin[it] = dq
             ddq_kin[it] = ddq
@@ -275,5 +314,8 @@ class SecondOrderInverseKinematics(object):
             LForient_error = pin.log3(Lfoot_orien.T @ orien_ref.matrix()) 
             rf_ori_kin[it] = RForient_error
             lf_ori_kin[it] = LForient_error
-
-        return q_kin, dq_kin, ddq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, rf_ori_kin, lf_ori_kin
+        print(q_kin[0])
+        print(q_kin[10])
+        
+        #k =sfs
+        return q_kin, dq_kin, ddq_kin, com_kin, lmom_kin, amom_kin, endeff_pos_kin, endeff_vel_kin, rf_ori_kin, lf_ori_kin, result

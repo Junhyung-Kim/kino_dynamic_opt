@@ -16,7 +16,7 @@ namespace momentumopt {
     planner_setting_ = &planner_setting;
   }
 
-  void ContactPlanInterface::fillDynamicsSequence(const DynamicsState& /*ini_state*/, DynamicsSequence& dynamics_sequence)
+  void ContactPlanInterface::fillDynamicsSequence(const DynamicsState& ini_state, DynamicsSequence& dynamics_sequence)
   {
 	// configuration of end-effectors during contact
     dynamics_sequence.activeEndeffectorSteps().setZero();
@@ -40,6 +40,14 @@ namespace momentumopt {
         }
       }
       dynamics_sequence.activeEndeffectorSteps()[eff_id] = counter;
+    }
+
+    for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
+
+      dynamics_sequence.dynamicsState(time_id).centerOfMass() = ini_state.centerOfMass();
+      dynamics_sequence.dynamicsState(time_id).ZMP() = ini_state.ZMP();
+      dynamics_sequence.dynamicsState(time_id).angularMomentumRate() = ini_state.angularMomentumRate();
+      dynamics_sequence.dynamicsState(time_id).linearMomentumRate() = ini_state.linearMomentumRate();
     }
   }
 

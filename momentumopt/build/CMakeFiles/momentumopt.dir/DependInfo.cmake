@@ -23,8 +23,12 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/jhk/kino_dynamic_opt/momentumopt/src/momentumopt/utilities/TrajectoryGenerator.cpp" "CMakeFiles/momentumopt.dir/src/momentumopt/utilities/TrajectoryGenerator.cpp.o" "gcc" "CMakeFiles/momentumopt.dir/src/momentumopt/utilities/TrajectoryGenerator.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.

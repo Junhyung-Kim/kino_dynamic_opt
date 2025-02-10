@@ -30,12 +30,6 @@
 /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/ContinuousCoverage.dir
 /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/ContinuousMemCheck.dir
 /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/ContinuousSubmit.dir
-/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt_sphinx_doxygen.dir
-/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt_breathe_apidoc.dir
-/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt_sphinx_apidoc.dir
-/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt_readme_symlink.dir
-/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt_license_symlink.dir
-/home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/momentumopt_sphinx_html.dir
 /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/test.dir
 /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/edit_cache.dir
 /home/jhk/kino_dynamic_opt/momentumopt/build/CMakeFiles/rebuild_cache.dir

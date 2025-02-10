@@ -140,7 +140,7 @@ def create_constraints(t, x, via=None):
 
     return constraints
 
-def create_constraints1(t, x, y, z, via=None):
+def create_constraints1(t, x, y, z, t1, via=None):
     # Generate minimum jerk trajectories for endeffector motion by
     # fitting a polynomial for every dimension (x, y, z).
     # t_0: Time when endeffector switches from being in contact to not being in contact
@@ -163,15 +163,15 @@ def create_constraints1(t, x, y, z, via=None):
     z_0 = z[0]
     z_1 = z[1]
 
-    constraints = np.zeros((6, 5))
+    constraints = np.zeros((6, 7))
 
     # constraints[i, :] = [t, x, order of derivative]
-    constraints[0, :] = [t_0, x_0, y_0, z_0, 0]
-    constraints[1, :] = [t_0, 0.0, 0.0, 0.0, 1]
-    constraints[2, :] = [t_0, 0.0, 0.0, 0.0, 2]
-    constraints[3, :] = [t_1, x_1,  y_1, z_1, 0]
-    constraints[4, :] = [t_1, 0.0, 0.0, 0.0, 1]
-    constraints[5, :] = [t_1, 0.0, 0.0, 0.0, 2]
+    constraints[0, :] = [t_0, x_0, y_0, z_0, 0, t1[0], t1[1]]
+    constraints[1, :] = [t_0, 0.0, 0.0, 0.0, 1, t1[0], t1[1]]
+    constraints[2, :] = [t_0, 0.0, 0.0, 0.0, 2, t1[0], t1[1]]
+    constraints[3, :] = [t_1, x_1,  y_1, z_1, 0, t1[0], t1[1]]
+    constraints[4, :] = [t_1, 0.0, 0.0, 0.0, 1, t1[0], t1[1]]
+    constraints[5, :] = [t_1, 0.0, 0.0, 0.0, 2, t1[0], t1[1]]
 
     return constraints
 
@@ -190,8 +190,8 @@ def poly_points(t, y_from, y_to, via=None):
     poly.fit()
     return poly
 
-def poly_points1(t, x_from, x_to, y_from, y_to, z_from, z_to, via=None):
-    constraints = create_constraints1(t, [x_from, x_to], [y_from, y_to], [z_from, z_to], via=via)
+def poly_points1(t, x_from, x_to, y_from, y_to, z_from, z_to, t1, via=None):
+    constraints = create_constraints1(t, [x_from, x_to], [y_from, y_to], [z_from, z_to], t1, via=via)
     return constraints
 
 class PolynominalList(object):
