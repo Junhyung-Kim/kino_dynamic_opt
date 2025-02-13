@@ -10,6 +10,7 @@
 '''
 
 import time
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -82,9 +83,10 @@ class MotionPlanner():
         self.kin_optimizer.robot.modelUpdateinit()      
         time = 0
         timex = 0
-        PELV_move = [-0.015*(i-2)+ timex * 0.1/50, 0.015*(j-2) - time * 0.205/50, 0.013 * (j2 - 2.5)]
+        zmp = [1.86027088e-01, 9.33588098e-02, 0]
+        PELV_move = [-0.01*(i-2)+ 1.12259405e-01, 0.01*(j-2) + 6.33166534e-02, 0.01 * (j2 - 2)-0.048]
         PELV_ori_move = [0.0, 0.0, 0.0]
-        PELVd_move = [0.0007 + 0.0008 * (l1-2), H2, -0.001] #2.0 timestep=7까지
+        PELVd_move = [0.00342471 + 0.0015 * (l1-1.5), 0.0022+H2, -0.0013] #2.0 timestep=7까지
         zmp_move = [0.015*(k-2), 0.015*(l-2), 0]
         PELVd_ori_move = [0.0, 0.0, 0.0]
 
@@ -102,13 +104,13 @@ class MotionPlanner():
         print("j2")
         print(j2)
         print(H2)
-        print("timestep=2")
+        print("timestep=40")
         print(PELVd_move)
         print("LF_tran")
         print(self.kin_optimizer.robot.LF_tran)
         #print(se3.__file__)
-        RF_temp = [-5.520129000000000008e-02, -1.024999999999999939e-01, 0.000000000000000000e+00]
-        RF_temp_prev = [-5.520129000000000008e-02, -1.024999999999999939e-01, 0.000000000000000000e+00]
+        RF_temp = [-5.127028191693373815e-02, -1.024999999999999939e-01, 3.285293329442226865e-04]
+        RF_temp_prev = [-5.178595348673378090e-02, -1.024999999999999939e-01, 1.031788837076454113e-04]
         
         self.kin_optimizer.robot.RF_tran = np.sum([RF_temp,[-0.03, 0.0, 0.15842]], axis = 0)
         self.kin_optimizer.robot.PELV_tran = self.kin_optimizer.robot.PELV_tran + PELV_move
@@ -153,7 +155,6 @@ class MotionPlanner():
         self.kin_optimizer.dq_init = qdot
 
         self.kin_optimizer.robot.modelUpdate(qinit, qdot)
-        zmp = [self.kin_optimizer.robot.data.com[0][0], self.kin_optimizer.robot.data.com[0][1], 0]
         for i in range(0,3):
             zmp[i] = zmp[i] + zmp_move[i]
         
@@ -170,6 +171,8 @@ class MotionPlanner():
         print(self.ini_state.zmp)
         print(qinit)
         print(self.kin_optimizer.robot.leg_q)
+       
+        #k  = sf
         #k = fs
         kin_optimizer = self.kin_optimizer
         inv_kin = kin_optimizer.inv_kin
@@ -224,26 +227,10 @@ class MotionPlanner():
     def optimize_dynamics(self, kd_iter):
         print("DynOpt", kd_iter)
         start = time.time()
-        '''
-        if(kd_iter == 0):
-            self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
-                                    self.kin_optimizer.kinematics_sequence, kd_iter > 0)
-            
-            self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
-                                    self.kin_optimizer.kinematics_sequence, kd_iter > 0)
-            
-            self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
-                                    self.kin_optimizer.kinematics_sequence, kd_iter > 0)
-        '''
+       
         self.dyn_optimizer.optimize(self.ini_state, self.contact_plan,
                                     self.kin_optimizer.kinematics_sequence, kd_iter > 0)
-        '''
-        for i in range(0, 60):
-            print(i)
-            #print(self.dyn_optimizer.dynamicsSequence().dynamics_states[i].com[0])
-            k = self.dyn_optimizer.dynamicsSequence().dynamics_states[i].lmomd[0]/95.941282 -(9.81+self.dyn_optimizer.dynamicsSequence().dynamics_states[i].lmomd[2]/95.941282)/(self.dyn_optimizer.dynamicsSequence().dynamics_states[i].com[2]-self.dyn_optimizer.dynamicsSequence().dynamics_states[i].zmp[2])*(self.dyn_optimizer.dynamicsSequence().dynamics_states[i].com[0]-self.dyn_optimizer.dynamicsSequence().dynamics_states[i].zmp[0] - self.dyn_optimizer.dynamicsSequence().dynamics_states[i].amomd[1]/(95.941282*(9.81+self.dyn_optimizer.dynamicsSequence().dynamics_states[i].lmomd[2]/95.941282)))
-            print(k)
-        '''
+        
         print("Dynopt - " , time.time() -start)
 
     def optimize_kinematics(self, kd_iter, plotting=False):
@@ -474,6 +461,22 @@ class MotionPlanner():
 
         self.optimize_dynamics(0)
         bool_iter = True
+
+        test_com = False
+        optimized_dyn_plan = self.dyn_optimizer.dynamicsSequence()
+            
+        for ii in range(0, 60):
+            if(abs(optimized_dyn_plan.dynamics_states[ii].com[0]) > 100 or math.isnan(optimized_dyn_plan.dynamics_states[ii].com[0])):
+                test_com = False
+                break
+            else:
+                test_com = True
+        if test_com == False:
+            print("test_com")
+            return 0, 0, \
+                0, 0, \
+                0, 0, 0, 0
+
         kd_iter = 0
         for kd_iter in range(0, self.planner_setting.get(PlannerIntParam_KinDynIterations)):
             result = self.optimize_kinematics(kd_iter + 1, plotting=False)
@@ -515,7 +518,7 @@ class MotionPlanner():
             self.optimize_dynamics_feedback()
         return optimized_kin_plan, kin_optimizer.motion_eff, \
                 optimized_dyn_plan, self.dynamics_feedback, \
-                self.planner_setting, time_vector, result
+                self.planner_setting, time_vector, result, 1
 
     def save_files1(self, kd_iter):
         time_vector = create_time_vector(self.dyn_optimizer.dynamicsSequence())

@@ -218,7 +218,8 @@ class SecondOrderInverseKinematics(object):
 
         inner_steps = int(dt/0.020)
         inner_dt = 0.020
-
+        print("com_ref")
+        print(com_ref)
         time = np.linspace(0., (num_time_steps-1)*dt, num_time_steps)
         splined_com_ref = CubicSpline(time, com_ref)
         splined_lmom_ref = CubicSpline(time, lmom_ref)
@@ -272,6 +273,7 @@ class SecondOrderInverseKinematics(object):
                         np.hstack((splined_lmom_ref(t), splined_amom_ref(t))), dmom_ref,
                         splined_endeff_pos_ref(t), splined_endeff_vel_ref(t), endeff_acc_ref,
                         endeff_contact[it], splined_joint_pos_ref(t))
+                
                 if result == 2:
                     print(it)
                     print("Sss")
@@ -279,7 +281,10 @@ class SecondOrderInverseKinematics(object):
                 # Integrate to the next state.
                 dq += ddq * inner_dt
                 q = pin.integrate(self.robot.model, q, dq * inner_dt)
+                pin.normalize(self.robot.model, q)
+
                 t += inner_dt
+            
             
                 self.update_kinematics(q, dq)
                 
