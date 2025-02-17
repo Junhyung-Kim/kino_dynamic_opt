@@ -256,35 +256,6 @@ class EndeffectorTrajectoryGenerator(object):
                     else:
                         poly1 = np.array(poly_points1(t, contact_plan[eff][i][2][0], contact_plan[eff][i][2][0], contact_plan[eff][i][2][1], contact_plan[eff][i][2][1], contact_plan[eff][i][2][2], contact_plan[eff][i][2][2], t1, 0.0))
             
-            
-        #temp
-        print(poly)
-        poly1 = copy.copy(poly)
-        poly1[0,0] = 0
-        poly1[0,1] = 0.195
-        poly1[0,2] = 0.102
-        poly1[0,6] = int(73)
-        poly1[1,6] = int(73)
-        poly1[2,6] = int(73)
-        poly1[3,0] = int(73)
-        poly1[4,0] = int(73)
-        poly1[5,0] = int(73)
-        poly1[3,1] = 0.195
-        poly1[3,2] = 0.102
-        poly1[3,6] = int(73)
-        poly1[4,6] = int(73)
-        poly1[5,6] = int(73)
-        
-
-        '''
-        poly1 = [[ 0.,     0.195,  0.102 , 0.  ,   0. ,    0.   , 73.   ]
-                [ 0.  ,   0.    , 0.    , 0.  ,   1. ,    0.  ,  73.   ]
-                [ 0.  ,   0.    , 0.    , 0.  ,   2. ,    0.  ,  73.   ]
-                [73.  ,   0.195 , 0.102 , 0.  ,   0. ,    0.  ,  73.   ]
-                [73.  ,   0.    , 0.    , 0.  ,   1. ,    0.  ,  73.   ]
-                [73.  ,   0.    , 0.    , 0.  ,   2. ,    0.  ,  73.   ]]
-        '''
-        print(poly1)
         return poly, poly1
 
 
@@ -322,7 +293,7 @@ class EndeffectorTrajectoryGenerator(object):
         for it in range(num_time_steps):
             for eff, name in enumerate(mom_kin_optimizer.eff_names):
                 if eff == 1:
-                    if(it < eff_traj_poly1[0,0]):
+                    if(it < eff_traj_poly1[3,0]):
                         x = eff_traj_poly1[0,1]
                         y = eff_traj_poly1[0,2]
                         z = eff_traj_poly1[0,3]
@@ -376,41 +347,24 @@ class EndeffectorTrajectoryGenerator(object):
 
                 
                 if eff == 1:
-                    #temp
-                    if(it >= eff_traj_poly1[0,0]):
-                        x = eff_traj_poly1[0,1]
-                        y = eff_traj_poly1[0,2]
-                        z = eff_traj_poly1[0,3]
-                        xv = 0.0
-                        yv = 0.0
-                        zv = 0.0
-              
-                        endeff_pos_ref[it][eff] = np.array([x, y, z])
-                        endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
-                        endeff_pos_ref1[eff][it] = np.array([x, y, z])
-                        
-                        endeff_pos_ref[it][eff] = np.array([x, y, z])
-                        endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
-                        endeff_pos_ref1[eff][it] = np.array([x, y, z])
-                
-                    '''
-                    if it >= eff_traj_poly1[0,0]:
-                        x = self.quinticSpline(it, int(eff_traj_poly1[0, 0]), int(eff_traj_poly1[0 , 0])+54, 0.1948, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 1], eff_traj_poly1[6*0 + 5, 1])
-                        xv = self.quinticSplineDot(it, int(eff_traj_poly1[0, 0]), int(eff_traj_poly1[0, 0])+54, 0.1948, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 1], eff_traj_poly1[6*0 + 5, 1])
-                        y = self.quinticSpline(it, int(eff_traj_poly1[0, 0]), int(eff_traj_poly1[0, 0])+54, 0.1025, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
-                        yv = self.quinticSplineDot(it, int(eff_traj_poly1[0, 0]), int(eff_traj_poly1[0, 0])+54, 0.1025, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
                     
-                        if (it <= (int(eff_traj_poly1[0, 0]) + int(eff_traj_poly1[0, 0])+ 54)/2):
-                            z = self.quinticSpline(it, int(eff_traj_poly1[0, 0]), (int(eff_traj_poly1[0, 0])  + int(eff_traj_poly1[0, 0])+54)/2, 0.0, 0.0, 0.0, 0.0 + 0.03, 0.0, 0.0)
-                            zv = self.quinticSplineDot(it, int(eff_traj_poly1[0, 0]) , (int(eff_traj_poly1[0, 0]) + int(eff_traj_poly1[0, 0])+54)/2, 0.0, 0.0, 0.0, 0.0 + 0.03,0.0, 0.0)
+                    if it >= eff_traj_poly1[3,0]:
+                        x = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1948, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 1], eff_traj_poly1[6*0 + 5, 1])
+                        xv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1948, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 1], eff_traj_poly1[6*0 + 5, 1])
+                        y = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1025, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
+                        yv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1025, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
+                    
+                        if (it <= (int(eff_traj_poly1[3, 0]) + int(eff_traj_poly1[3, 0])+ 55)/2):
+                            z = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, 0.0, 0.0, 0.0, 0.0 + 0.03, 0.0, 0.0)
+                            zv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]) , (int(eff_traj_poly1[3, 0]) + int(eff_traj_poly1[3, 0])+55)/2, 0.0, 0.0, 0.0, 0.0 + 0.03,0.0, 0.0)
                         else:
-                            z = self.quinticSpline(it, (int(eff_traj_poly1[0, 0])  + int(eff_traj_poly1[0, 0])+54)/2, int(eff_traj_poly1[0, 0])+54, 0.0 , 0.0, 0.0, 0.03, 0.0, 0.0)
-                            zv = self.quinticSplineDot(it, (int(eff_traj_poly1[0, 0])  + int(eff_traj_poly1[0, 0])+54)/2, int(eff_traj_poly1[0, 0])+54, 0.0 + 0.03, 0.0, 0.0, -0.08, 0.0, 0.0)
+                            z = self.quinticSpline(it, (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, int(eff_traj_poly1[3, 0])+55, 0.0 , 0.0, 0.0, 0.03, 0.0, 0.0)
+                            zv = self.quinticSplineDot(it, (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, int(eff_traj_poly1[3, 0])+55, 0.0 + 0.03, 0.0, 0.0, -0.08, 0.0, 0.0)
                     
                         endeff_pos_ref[it][eff] = np.array([x, y, z])
                         endeff_vel_ref[it][eff] = np.array([xv, yv, zv])
                         endeff_pos_ref1[eff][it] = np.array([x, y, z])
-                    '''
+                    
                 else:
                     '''
                     if it >= eff_traj_poly[0,0]:
@@ -452,8 +406,8 @@ class EndeffectorTrajectoryGenerator(object):
                     endeff_pos_ref1[eff][i][2] = 0.0
 
         
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=40/lfoot1.txt", endeff_pos_ref1[0])
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=40/rfoot1.txt", endeff_pos_ref1[1])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/lfoot2.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/rfoot2.txt", endeff_pos_ref1[1])
         #k = dsfs
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 

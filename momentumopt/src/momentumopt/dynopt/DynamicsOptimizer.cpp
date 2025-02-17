@@ -30,6 +30,7 @@ namespace momentumopt {
 
   void DynamicsOptimizer::initializeOptimizationVariables()
   {
+    count = 0;
     num_vars_ = 0.;
     double inf_value = SolverSetting::inf;
 
@@ -72,11 +73,11 @@ namespace momentumopt {
     contact_plan_ = contact_plan;
     weight_desired_com_tracking_.setZero();
     //com_pos_goal_ = ini_state_.centerOfMass() + this->getSetting().get(PlannerVectorParam_CenterOfMassMotion);
-    com_pos_goal_<< 0.08 + 0.3400, 0.0, 8.12635584e-01;
+    com_pos_goal_<< 0.09 + 0.3500, 0.0, 8.22635584e-01;
     int timey = 0;
     int timex = 0;
     com_pos_goal_(0) = com_pos_goal_(0);
-    com_pos_goal_(1) = com_pos_goal_(1) - 0.03;
+    com_pos_goal_(1) = com_pos_goal_(1) - 0.05;
     com_pos_goal_(2) = 8.12635584e-01;
     std::cout << "com_pos_goal" << com_pos_goal_.transpose() << std::endl;
 
@@ -132,7 +133,7 @@ namespace momentumopt {
 
       double ZMP_ux, ZMP_lx, ZMP_uy, ZMP_ly;
       std::fstream file1;
-      file1.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=40/timestep0_zmp3_ssp1_1.txt",std::ios_base::out);    
+      file1.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/timestep0_zmp3_ssp1_1.txt",std::ios_base::out);    
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         for (int axis_id=0; axis_id<3; axis_id++) {
           // penalty on center of mass, linear and angular momentum with Kinematics
@@ -208,7 +209,7 @@ namespace momentumopt {
       bool zmp_bool = true;
       bool zmp_double = false;
       std::fstream file;
-      file.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=40/timestep0_zmp2_ssp1_1.txt",std::ios_base::out);
+      file.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/timestep0_zmp2_ssp1_1.txt",std::ios_base::out);
       // center of mass above endeffector positions, ZMP constraint
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         if(dynamicsSequence().dynamicsState(time_id).endeffectorActivation(0) == true && dynamicsSequence().dynamicsState(time_id).endeffectorActivation(1) == true)
@@ -262,9 +263,10 @@ namespace momentumopt {
       
         if(time_id >= 0)
         {
-          double zmpx, zmpy;
+          double zmpx, zmpy, zmpz_;
           zmpx = (ZMP_lx + ZMP_ux)/2;
           zmpy = (ZMP_ly + ZMP_uy)/2;
+          zmpz_ = 0;
           if(zmp_double == false)
           {
             quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[0], (LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(zmpx)));
@@ -275,7 +277,65 @@ namespace momentumopt {
             quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[0]/10, (LinExpr(vars_[ZMP_.id(0,time_id)]) - LinExpr(zmpx)));
             quad_objective_.addQuaTerm(this->getSetting().get(PlannerVectorParam_WeightZMPC)[1]/10, (LinExpr(vars_[ZMP_.id(1,time_id)]) - LinExpr(zmpy)));
           }
-          file1 << zmpx << " "<<zmpy << std::endl;
+
+          if(zmp_double == true)
+          {
+              if((ZMP_lx+ZMP_ux)/2 > 0.3)
+              {
+                count = count + 1;
+                //special
+                for (int axis_id=2; axis_id<3; axis_id++) {
+                if (time_id==0) { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]);}
+                else            { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]); }
+                //model_.addLinConstr(lin_cons_, "<", 0.0);
+                }
+                if(count>=27)
+                {
+                  zmpz_ = -0.08/8*(count-27);
+                  lin_cons_ = LinExpr(vars_[ZMP_.id(2,time_id)]);
+                  model_.addLinConstr(lin_cons_, "=", zmpz_);
+                  //quad_objective_.addQuaTerm(1000.0, (LinExpr(vars_[ZMP_.id(2,time_id)]) - LinExpr(zmpz_)));
+                }
+                else
+                {
+                  lin_cons_ = LinExpr(vars_[ZMP_.id(2,time_id)]);
+                  model_.addLinConstr(lin_cons_, "=", 0.0);
+                }
+              }
+              else
+              {
+                //special
+                for (int axis_id=2; axis_id<3; axis_id++) {
+                if (time_id==0) { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]);}
+                else            { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]); }
+                model_.addLinConstr(lin_cons_, "=", 0.0);
+                }
+              }
+          }
+          else
+          {
+            if((ZMP_lx+ZMP_ux)/2 > 0.4)
+            {
+              //special
+              zmpz_ = -0.08;
+              for (int axis_id=2; axis_id<3; axis_id++) {
+              if (time_id==0) { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]);}
+              else            { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]); }
+              model_.addLinConstr(lin_cons_, "=", zmpz_);
+              }
+            }
+            else
+            {
+              //special
+              for (int axis_id=2; axis_id<3; axis_id++) {
+              if (time_id==0) { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]);}
+              else            { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]); }
+              model_.addLinConstr(lin_cons_, "=", 0.0);
+              }
+            }
+          }
+
+          file1 << zmpx << " "<<zmpy << " " << zmpz_ <<  " " << count <<std::endl;
         }
         
         // ZMP constraint
@@ -429,11 +489,11 @@ namespace momentumopt {
           model_.addLinConstr(lin_cons_, "=", 0.0);
         }
 
-        for (int axis_id=2; axis_id<3; axis_id++) {
+        /*for (int axis_id=2; axis_id<3; axis_id++) {
           if (time_id==0) { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]);}
           else            { lin_cons_ = LinExpr(vars_[ZMP_.id(axis_id,time_id)]); }
           model_.addLinConstr(lin_cons_, "=", 0.0);
-        }
+        }*/
 
         // linear momentum constraint
         for (int axis_id=0; axis_id<3; axis_id++) {

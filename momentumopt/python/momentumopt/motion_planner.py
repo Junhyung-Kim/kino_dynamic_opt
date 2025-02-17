@@ -83,12 +83,13 @@ class MotionPlanner():
         self.kin_optimizer.robot.modelUpdateinit()      
         time = 0
         timex = 0
-        zmp = [1.86027088e-01, 9.33588098e-02, 0]
-        PELV_move = [-0.01*(i-2)+ 1.12259405e-01, 0.01*(j-2) + 6.33166534e-02, 0.01 * (j2 - 2)-0.048]
+        zmp = [2.16027088e-01, 8.33588098e-02, 0]
+        PELV_move = [-0.01*(i-2)+ 1.9681442e-01, 0.01*(j-2) + 6.87469340e-02, 0.005 * (j2 - 2)-0.068]
         PELV_ori_move = [0.0, 0.0, 0.0]
-        PELVd_move = [0.00342471 + 0.0015 * (l1-1.5), 0.0022+H2, -0.0013] #2.0 timestep=7까지
+        PELVd_move = [0.001 + 0.0015 * (l1-1.5), -0.001+H2, -0.0002] #2.0 timestep=7까지
         zmp_move = [0.015*(k-2), 0.015*(l-2), 0]
         PELVd_ori_move = [0.0, 0.0, 0.0]
+
 
         print("i")
         print(i)
@@ -104,14 +105,22 @@ class MotionPlanner():
         print("j2")
         print(j2)
         print(H2)
-        print("timestep=40")
+        print("timestep=84")
         print(PELVd_move)
         print("LF_tran")
         print(self.kin_optimizer.robot.LF_tran)
         #print(se3.__file__)
-        RF_temp = [-5.127028191693373815e-02, -1.024999999999999939e-01, 3.285293329442226865e-04]
-        RF_temp_prev = [-5.178595348673378090e-02, -1.024999999999999939e-01, 1.031788837076454113e-04]
+
+        #timestep= 82
+        #RF_temp = [4.224894103125953482e-01, -1.024999999999999939e-01, -5.176149170138663602e-02]
+        #RF_temp_prev = [4.160234338652156749e-01, -1.024999999999999939e-01, -4.508160000000005496e-02]
+    
+        #timestep= 80
+        RF_temp = [4.086124413974289160e-01, -1.024999999999999939e-01, -3.798395322723858991e-02]
+        RF_temp_prev = [4.002549522034899443e-01, -1.024999999999999939e-01, -3.061385293354281986e-02]
+
         
+
         self.kin_optimizer.robot.RF_tran = np.sum([RF_temp,[-0.03, 0.0, 0.15842]], axis = 0)
         self.kin_optimizer.robot.PELV_tran = self.kin_optimizer.robot.PELV_tran + PELV_move
         self.kin_optimizer.robot.PELVd_tran = PELVd_move
@@ -466,7 +475,7 @@ class MotionPlanner():
         optimized_dyn_plan = self.dyn_optimizer.dynamicsSequence()
             
         for ii in range(0, 60):
-            if(abs(optimized_dyn_plan.dynamics_states[ii].com[0]) > 100 or math.isnan(optimized_dyn_plan.dynamics_states[ii].com[0])):
+            if(abs(optimized_dyn_plan.dynamics_states[ii].com[0]) > 1.0 or math.isnan(optimized_dyn_plan.dynamics_states[ii].com[0])):
                 test_com = False
                 break
             else:

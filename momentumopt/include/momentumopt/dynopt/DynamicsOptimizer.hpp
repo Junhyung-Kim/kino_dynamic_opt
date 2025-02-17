@@ -192,6 +192,7 @@ namespace momentumopt {
 
       /*! helper optimization variables for the optimization problem */
       solver::OptimizationVariable dt_, com_, lmom_, amom_, lmomd_, amomd_, ZMP_, ZMPd_;
+      int count = 0;
       std::array<solver::OptimizationVariable, Problem::n_endeffs_> ub_var_, lb_var_;
 
       /*! helper matrices and vectors for the optimization problem */

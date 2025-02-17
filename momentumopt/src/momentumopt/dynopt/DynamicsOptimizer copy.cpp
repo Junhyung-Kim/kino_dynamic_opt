@@ -130,7 +130,7 @@ namespace momentumopt {
 
       double ZMP_ux, ZMP_lx, ZMP_uy, ZMP_ly;
       std::fstream file1;
-      file1.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=40/timestep0_zmp3_ssp1_1.txt",std::ios_base::out);    
+      file1.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/timestep0_zmp3_ssp1_1.txt",std::ios_base::out);    
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         for (int axis_id=0; axis_id<3; axis_id++) {
           // penalty on center of mass, linear and angular momentum with Kinematics
@@ -206,7 +206,7 @@ namespace momentumopt {
       bool zmp_bool = true;
       bool zmp_double = false;
       std::fstream file;
-      file.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=40/timestep0_zmp2_ssp1_1.txt",std::ios_base::out);
+      file.open("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/timestep0_zmp2_ssp1_1.txt",std::ios_base::out);
       // center of mass above endeffector positions, ZMP constraint
       for (int time_id=0; time_id<this->getSetting().get(PlannerIntParam_NumTimesteps); time_id++) {
         if(dynamicsSequence().dynamicsState(time_id).endeffectorActivation(0) == true && dynamicsSequence().dynamicsState(time_id).endeffectorActivation(1) == true)
