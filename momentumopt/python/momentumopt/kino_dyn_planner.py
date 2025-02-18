@@ -129,7 +129,7 @@ def main(argv):
     crocs_data1['Right']['acc_trajs'] = []        
     crocs_data1['Right']['u_trajs'] = []
     boole = False
-    JJJJ = 3 #1 0.0006 4
+    JJJJ = 0 #1 0.0006 4
     for i1 in range(JJJJ,JJJJ+1):
         for j1 in range(0,5):#5):
             for j2 in range(0,5):#5):
@@ -137,14 +137,14 @@ def main(argv):
                     for j4 in range(0,5):#5): #speed
                         for j5 in range(0,3):#3):
                             # 이번에는 4
-                            if j1 == 4 and j2 == 2 and j3 == 0 and j4 == 0 and j5 == 0:
+                            if j1 == 0 and j2 == 0 and j3 == 0 and j4 == 0 and j5 == 0:
                                 boole  = True
         
                             if j1 == 5 and j2 == 0 and j3 == 0 and j4 == 0 and j5 == 0:
                                 
                                 boole = False
 
-                            H2 = -0.0003 # 0.0001 0.0004 -0.0003
+                            H2 = 0.0003 # -0.0001 0.0003 -0.0004
                             
                             H3 = '_0'
                             
@@ -194,7 +194,7 @@ def main(argv):
                                     crocs_data['Right']['x_state'].append(copy(state_x))
                                     crocs_data['Right']['x_inputs'].append(copy([i1, j1, j2, j3, j4]))
 
-                                    H1 = '/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/Fdyn_data5'
+                                    H1 = '/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/Fdyn_data5'
                                     G = H1 + str(i1) + '_' + str(H2) + H3 + '.txt'
                                     print(G)
                                     with open(G,'wb') as f:

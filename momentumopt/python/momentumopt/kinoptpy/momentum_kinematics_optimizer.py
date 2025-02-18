@@ -358,7 +358,7 @@ class EndeffectorTrajectoryGenerator(object):
                             z = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, 0.0, 0.0, 0.0, 0.0 + 0.03, 0.0, 0.0)
                             zv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]) , (int(eff_traj_poly1[3, 0]) + int(eff_traj_poly1[3, 0])+55)/2, 0.0, 0.0, 0.0, 0.0 + 0.03,0.0, 0.0)
                         else:
-                            z = self.quinticSpline(it, (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, int(eff_traj_poly1[3, 0])+55, 0.0 , 0.0, 0.0, 0.03, 0.0, 0.0)
+                            z = self.quinticSpline(it, (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, int(eff_traj_poly1[3, 0])+55, 0.03, 0.0, 0.0, -0.08, 0.0, 0.0)
                             zv = self.quinticSplineDot(it, (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, int(eff_traj_poly1[3, 0])+55, 0.0 + 0.03, 0.0, 0.0, -0.08, 0.0, 0.0)
                     
                         endeff_pos_ref[it][eff] = np.array([x, y, z])
@@ -406,8 +406,8 @@ class EndeffectorTrajectoryGenerator(object):
                     endeff_pos_ref1[eff][i][2] = 0.0
 
         
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/lfoot2.txt", endeff_pos_ref1[0])
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/rfoot2.txt", endeff_pos_ref1[1])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/lfoot2.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/rfoot2.txt", endeff_pos_ref1[1])
         #k = dsfs
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 

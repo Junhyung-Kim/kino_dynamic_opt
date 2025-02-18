@@ -422,8 +422,8 @@ class EndeffectorTrajectoryGenerator(object):
                     endeff_pos_ref1[eff][i][2] = 0.0
 
         
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/lfoot1.txt", endeff_pos_ref1[0])
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/rfoot1.txt", endeff_pos_ref1[1])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/lfoot1.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/rfoot1.txt", endeff_pos_ref1[1])
         
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 

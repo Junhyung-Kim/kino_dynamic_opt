@@ -429,10 +429,10 @@ class EndeffectorTrajectoryGenerator(object):
         print(endeff_vel_ref)
         k = ss
         '''
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/lfoot1.txt", endeff_pos_ref1[0])
-        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/rfoot1.txt", endeff_pos_ref1[1])
-        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/vel.txt", endeff_vel_ref)
-        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=84/rfoot1_vel.txt", endeff_vel_ref1[1])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/lfoot1.txt", endeff_pos_ref1[0])
+        np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/rfoot1.txt", endeff_pos_ref1[1])
+        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/vel.txt", endeff_vel_ref)
+        #np.savetxt("/home/jhk/walkingdata1/stairdown/25cm/ssp2/timestep=90/rfoot1_vel.txt", endeff_vel_ref1[1])
         
         return endeff_pos_ref, endeff_vel_ref, endeff_contact
 

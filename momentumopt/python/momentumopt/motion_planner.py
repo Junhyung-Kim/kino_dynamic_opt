@@ -81,10 +81,11 @@ class MotionPlanner():
 
     def init_from_settings(self, i=0, j=0, k=0, l=0, l1 = 0, j2 = 0, H2=0):
         self.kin_optimizer.robot.modelUpdateinit()      
+        self.kin_optimizer.robot.modelUpdateinit()      
         time = 0
         timex = 0
         zmp = [2.16027088e-01, 8.33588098e-02, 0]
-        PELV_move = [-0.01*(i-2)+ 1.9681442e-01, 0.01*(j-2) + 6.87469340e-02, 0.005 * (j2 - 2)-0.068]
+        PELV_move = [-0.01*(i-2)+ 1.9681442e-01, 0.01*(j-2) + 4.07469340e-02, 0.005 * (j2 - 2)-0.07]
         PELV_ori_move = [0.0, 0.0, 0.0]
         PELVd_move = [0.001 + 0.0015 * (l1-1.5), -0.001+H2, -0.0002] #2.0 timestep=7까지
         zmp_move = [0.015*(k-2), 0.015*(l-2), 0]
@@ -105,20 +106,21 @@ class MotionPlanner():
         print("j2")
         print(j2)
         print(H2)
-        print("timestep=84")
+        print("timestep=90")
         print(PELVd_move)
         print("LF_tran")
         print(self.kin_optimizer.robot.LF_tran)
         #print(se3.__file__)
 
-        #timestep= 82
-        #RF_temp = [4.224894103125953482e-01, -1.024999999999999939e-01, -5.176149170138663602e-02]
-        #RF_temp_prev = [4.160234338652156749e-01, -1.024999999999999939e-01, -4.508160000000005496e-02]
-    
-        #timestep= 80
-        RF_temp = [4.086124413974289160e-01, -1.024999999999999939e-01, -3.798395322723858991e-02]
-        RF_temp_prev = [4.002549522034899443e-01, -1.024999999999999939e-01, -3.061385293354281986e-02]
+        #timestep= 90
+        RF_temp = [4.430900310502514650e-01, -1.024999999999999939e-01, -7.731047704391785791e-02
+]
+        RF_temp_prev = [4.415565815797473093e-01, -1.024999999999999939e-01, -7.506044669079980913e-02]
 
+        #timestep= 88
+        #RF_temp = [4.393581471592811205e-01, -1.024999999999999939e-01, -7.198791514240832079e-02]
+        #RF_temp_prev = [4.364122228647553392e-01, -1.024999999999999939e-01, -6.807955871866680497e-02]
+        
         
 
         self.kin_optimizer.robot.RF_tran = np.sum([RF_temp,[-0.03, 0.0, 0.15842]], axis = 0)
