@@ -351,8 +351,8 @@ class EndeffectorTrajectoryGenerator(object):
                     if it >= eff_traj_poly1[3,0]:
                         x = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1948, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 1], eff_traj_poly1[6*0 + 5, 1])
                         xv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1948, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 1], eff_traj_poly1[6*0 + 5, 1])
-                        y = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1025, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
-                        yv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1025, 0, 0, 0.6948, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
+                        y = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1025, 0, 0, 0.1025, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
+                        yv = self.quinticSplineDot(it, int(eff_traj_poly1[3, 0]), int(eff_traj_poly1[3, 0])+55, 0.1025, 0, 0, 0.1025, eff_traj_poly1[6* 0 + 4, 2], eff_traj_poly1[6*0 + 5, 2])
                     
                         if (it <= (int(eff_traj_poly1[3, 0]) + int(eff_traj_poly1[3, 0])+ 55)/2):
                             z = self.quinticSpline(it, int(eff_traj_poly1[3, 0]), (int(eff_traj_poly1[3, 0])  + int(eff_traj_poly1[3, 0])+55)/2, 0.0, 0.0, 0.0, 0.0 + 0.03, 0.0, 0.0)
